@@ -1,0 +1,8 @@
+{
+  "@@locale": "en",
+  "login": "Login",
+  "email": "Email",
+  "password": "Password",
+  "loginError": "Login unsuccessful. Try again!",
+  "appName": "OrderLink"
+}
