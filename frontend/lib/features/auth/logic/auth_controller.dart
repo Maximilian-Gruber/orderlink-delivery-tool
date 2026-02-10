@@ -35,7 +35,6 @@ class AuthController extends StateNotifier<AuthState> {
       final token = await api.login(email, password);
       await storage.saveToken(token);
       state = state.copyWith(token: token, loading: false);
-      print(await storage.getToken());
     } catch (e) {
       state = state.copyWith(error: e.toString(), loading: false);
     }
