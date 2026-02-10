@@ -47,6 +47,11 @@ class AuthController extends StateNotifier<AuthState> {
       state = state.copyWith(error: e.toString(), loading: false);
     }
   }
+
+  Future<void> logout() async {
+    await storage.clear();
+    state = AuthState();
+  }
 }
 
 final authControllerProvider =
