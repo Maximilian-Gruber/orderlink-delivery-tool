@@ -27,6 +27,14 @@ class AuthController extends StateNotifier<AuthState> {
   AuthController(this.ref) : super(AuthState()) {
     storage = SecureStorage();
     api = AuthApi(ApiClient(storage: storage));
+    _loadToken();
+  }
+
+  Future<void> _loadToken() async {
+    final token = await storage.getToken();
+    if (token != null) {
+      state = state.copyWith(token: token);
+    }
   }
 
   Future<void> login(String email, String password) async {
