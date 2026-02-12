@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../l10n/app_localizations.dart';
 import '../logic/auth_controller.dart';
 import '../models/site_config_model.dart';
+import '../../../core/config.dart';
 
 class LoginPage extends ConsumerStatefulWidget {
   const LoginPage({super.key});
@@ -34,6 +35,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
     final screenWidth = MediaQuery.of(context).size.width;
     final fieldWidth = screenWidth * 0.9;
     final loc = AppLocalizations.of(context)!;
+    
 
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
@@ -60,29 +62,33 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                     ),
                   ),
                 ),
-                data: (config) => Padding(
-                  padding: EdgeInsets.only(bottom: screenWidth * 0.12),
-                  child: Column(
-                    children: [
-                      /*if (config.logoPath.isNotEmpty)
-                        Padding(
-                          padding: const EdgeInsets.only(bottom: 16),
-                          child: Image.network(
-                            config.logoPath,
-                            height: screenWidth * 0.25,
+                data: (config) {
+                  final imageUrl =
+                      "${AppConfig.publicStorageBase}/${config.logoPath}";
+                  return Padding(
+                    padding: EdgeInsets.only(bottom: screenWidth * 0.12),
+                    child: Column(
+                      children: [
+                        if (config.logoPath.isNotEmpty)
+                          Padding(
+                            padding: const EdgeInsets.only(bottom: 20),
+                            child: Image.network(
+                              imageUrl,
+                              height: screenWidth * 0.5,
+                            ),
                           ),
-                        ),*/
-                      Text(
-                        config.companyName,
-                        style: TextStyle(
-                          fontSize: screenWidth * 0.1,
-                          fontWeight: FontWeight.bold,
-                          color: textColor,
+                        Text(
+                          config.companyName,
+                          style: TextStyle(
+                            fontSize: screenWidth * 0.075,
+                            fontWeight: FontWeight.bold,
+                            color: textColor,
+                          ),
                         ),
-                      ),
-                    ],
-                  ),
-                ),
+                      ],
+                    ),
+                  );
+                },
               ),
               // Email Field
               SizedBox(
