@@ -63,8 +63,6 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                   ),
                 ),
                 data: (config) {
-                  final imageUrl =
-                      "${AppConfig.publicStorageBase}/${config.logoPath}";
                   return Padding(
                     padding: EdgeInsets.only(bottom: screenWidth * 0.12),
                     child: Column(
