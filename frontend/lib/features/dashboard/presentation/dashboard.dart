@@ -14,8 +14,7 @@ class Dashboard extends ConsumerWidget {
           IconButton(
             icon: const Icon(Icons.logout),
             onPressed: () {
-              ref.read(authControllerProvider.notifier)
-                  .state = AuthState();
+              ref.read(authControllerProvider.notifier).logout();
             },
           ),
         ],

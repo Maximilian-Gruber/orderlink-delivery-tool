@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../l10n/app_localizations.dart';
 import '../logic/auth_controller.dart';
+import '../models/site_config_model.dart';
 
 class LoginPage extends ConsumerStatefulWidget {
   const LoginPage({super.key});
@@ -25,6 +26,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
   Widget build(BuildContext context) {
     final state = ref.watch(authControllerProvider);
     final controller = ref.read(authControllerProvider.notifier);
+    final siteConfigAsync = ref.watch(siteConfigProvider);
 
     final theme = Theme.of(context);
     final primaryColor = theme.colorScheme.primary;
@@ -42,18 +44,46 @@ class _LoginPageState extends ConsumerState<LoginPage> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               // App Name / Logo
-              Padding(
-                padding: const EdgeInsets.only(bottom: 48),
-                child: Text(
-                  loc.appName,
-                  style: TextStyle(
-                    fontSize: screenWidth * 0.1,
-                    fontWeight: FontWeight.bold,
-                    color: textColor,
+              siteConfigAsync.when(
+                loading: () => Padding(
+                  padding: EdgeInsets.only(bottom: screenWidth * 0.12),
+                  child: const CircularProgressIndicator(),
+                ),
+                error: (_, __) => Padding(
+                  padding: EdgeInsets.only(bottom: screenWidth * 0.12),
+                  child: Text(
+                    loc.appName,
+                    style: TextStyle(
+                      fontSize: screenWidth * 0.1,
+                      fontWeight: FontWeight.bold,
+                      color: textColor,
+                    ),
+                  ),
+                ),
+                data: (config) => Padding(
+                  padding: EdgeInsets.only(bottom: screenWidth * 0.12),
+                  child: Column(
+                    children: [
+                      /*if (config.logoPath.isNotEmpty)
+                        Padding(
+                          padding: const EdgeInsets.only(bottom: 16),
+                          child: Image.network(
+                            config.logoPath,
+                            height: screenWidth * 0.25,
+                          ),
+                        ),*/
+                      Text(
+                        config.companyName,
+                        style: TextStyle(
+                          fontSize: screenWidth * 0.1,
+                          fontWeight: FontWeight.bold,
+                          color: textColor,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ),
-
               // Email Field
               SizedBox(
                 width: fieldWidth,
@@ -67,7 +97,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                   ),
                 ),
               ),
-              const SizedBox(height: 16),
+              SizedBox(height: screenWidth * 0.04),
 
               // Password Field
               SizedBox(
@@ -82,30 +112,30 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                   ),
                 ),
               ),
-              const SizedBox(height: 24),
+              SizedBox(height: screenWidth * 0.06),
 
               // Error Message
               if (state.error != null)
                 Padding(
-                  padding: const EdgeInsets.only(bottom: 16),
+                  padding: EdgeInsets.only(bottom: screenWidth * 0.04),
                   child: Text(
                     loc.loginError,
-                    style: TextStyle(color: theme.colorScheme.error),
+                    style: TextStyle(color: theme.colorScheme.error, fontSize: screenWidth * 0.04),
                   ),
                 ),
 
               // Login Button
               SizedBox(
                 width: fieldWidth,
-                height: 50,
+                height: screenWidth * 0.12,
                 child: ElevatedButton(
                   style: ElevatedButton.styleFrom(
                     backgroundColor: primaryColor,
                     foregroundColor: theme.brightness == Brightness.dark
                         ? Colors.black
                         : Colors.white,
-                    textStyle: const TextStyle(
-                      fontSize: 18,
+                    textStyle: TextStyle(
+                      fontSize: screenWidth * 0.05,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
@@ -119,13 +149,13 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                         },
                   child: state.loading
                       ? SizedBox(
-                          width: 24,
-                          height: 24,
+                          width: screenWidth * 0.05,
+                          height: screenWidth * 0.05,
                           child: CircularProgressIndicator(
                             color: theme.brightness == Brightness.dark
                                 ? Colors.black
                                 : Colors.white,
-                            strokeWidth: 2,
+                            strokeWidth: screenWidth * 0.01,
                           ),
                         )
                       : Text(loc.login),

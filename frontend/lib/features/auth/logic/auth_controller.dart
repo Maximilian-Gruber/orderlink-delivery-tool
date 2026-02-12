@@ -2,6 +2,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:frontend/core/api/api_client.dart';
 import 'package:frontend/core/storage/secure_storage.dart';
 import '../data/auth_api.dart';
+import '../data/site_config_api.dart';
+import '../models/site_config_model.dart';
 
 class AuthState {
   final bool loading;
@@ -23,10 +25,13 @@ class AuthController extends StateNotifier<AuthState> {
   final Ref ref;
   late final SecureStorage storage;
   late final AuthApi api;
+  late final SiteConfigApi siteConfigApi;
+
 
   AuthController(this.ref) : super(AuthState()) {
     storage = SecureStorage();
     api = AuthApi(ApiClient(storage: storage));
+    siteConfigApi = SiteConfigApi(ApiClient(storage: storage));
     _loadToken();
   }
 
@@ -58,3 +63,13 @@ final authControllerProvider =
     StateNotifierProvider<AuthController, AuthState>((ref) {
   return AuthController(ref);
 });
+
+final siteConfigProvider =
+    FutureProvider<SiteConfigLoginPage>((ref) async {
+  final storage = SecureStorage();
+  final apiClient = ApiClient(storage: storage);
+  final api = SiteConfigApi(apiClient);
+
+  return api.fetchConfig();
+});
+

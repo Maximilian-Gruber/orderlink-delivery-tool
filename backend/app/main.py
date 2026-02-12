@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from .database import engine, Base
-from .routers import auth
+from .routers import auth, site_config
 import app.models
 
 Base.metadata.create_all(bind=engine)
@@ -8,6 +8,7 @@ Base.metadata.create_all(bind=engine)
 app = FastAPI(title="FastAPI + Postgres (Docker Safe Setup)")
 
 app.include_router(auth.router)
+app.include_router(site_config.router)
 
 @app.get("/health", tags=["health check"])
 def health():
