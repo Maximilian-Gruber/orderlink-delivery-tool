@@ -4,11 +4,13 @@ from sqlalchemy.orm import Session
 from app.database import get_db
 from app.schemas.route import RouteSimple
 from app.crud.route import RouteCRUD
+from app.dependencies.auth import get_current_user
+from app.models.employee import Employees
 
 router = APIRouter(prefix="/routes", tags=["routes"])
 
 @router.get("/active-routes-with-orders-products", response_model=list[RouteSimple])
-def get_logistics_overview(db: Session = Depends(get_db)):
+def get_logistics_overview(db: Session = Depends(get_db), current_user: Employees = Depends(get_current_user)):
     routes = RouteCRUD.get_active_routes_with_orders(db)
     
     result = []
