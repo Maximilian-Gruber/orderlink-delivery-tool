@@ -22,4 +22,13 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get appName => 'OrderLink';
+
+  @override
+  String get openRoutes => 'Offene Routen';
+
+  @override
+  String get stops => 'Stops';
+
+  @override
+  String get selectRoute => 'Route auswählen';
 }

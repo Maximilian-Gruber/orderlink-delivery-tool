@@ -43,7 +43,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              // App Name / Logo
+              // Company Name / Logo
               siteConfigAsync.when(
                 loading: () => Padding(
                   padding: EdgeInsets.only(bottom: screenWidth * 0.12),

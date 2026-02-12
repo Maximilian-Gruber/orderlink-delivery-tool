@@ -124,6 +124,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'OrderLink'**
   String get appName;
+
+  /// No description provided for @openRoutes.
+  ///
+  /// In en, this message translates to:
+  /// **'Open Routes'**
+  String get openRoutes;
+
+  /// No description provided for @stops.
+  ///
+  /// In en, this message translates to:
+  /// **'Stops'**
+  String get stops;
+
+  /// No description provided for @selectRoute.
+  ///
+  /// In en, this message translates to:
+  /// **'Select Route'**
+  String get selectRoute;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {
