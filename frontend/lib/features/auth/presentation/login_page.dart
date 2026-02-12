@@ -79,8 +79,9 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                           ),
                         Text(
                           config.companyName,
+                          textAlign: TextAlign.center,
                           style: TextStyle(
-                            fontSize: screenWidth * 0.045,
+                            fontSize: screenWidth * 0.05,
                             fontWeight: FontWeight.bold,
                             color: textColor,
                           ),
