@@ -20,28 +20,19 @@ def get_logistics_overview(db: Session = Depends(get_db), current_user: Employee
             o = roo.order
             if o.deliveryDate is None:
                 addr = o.customer.address 
-                
                 orders_list.append({
-                    "orderId": o.orderId,
                     "customerName": f"{o.customer.firstName} {o.customer.lastName}",
-                    "orderState": o.orderState.value if hasattr(o.orderState, 'value') else str(o.orderState),
                     "city": addr.city if addr else "N/A",
                     "postCode": addr.postCode if addr else "N/A",
                     "streetName": addr.streetName if addr else "N/A",
                     "streetNumber": addr.streetNumber if addr else "N/A",
-                    "products": [
-                        {
-                            "name": op.product.name, 
-                            "productAmount": op.productAmount
-                        } for op in o.products
-                    ]
                 })
         
         if orders_list:
             result.append({
                 "routeId": r.routeId,
                 "routeName": r.name,
-                "orders": orders_list
+                "customers": orders_list
             })
             
     return result
