@@ -73,14 +73,14 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                           Padding(
                             padding: const EdgeInsets.only(bottom: 20),
                             child: Image.network(
-                              imageUrl,
+                              config.logoPath,
                               height: screenWidth * 0.5,
                             ),
                           ),
                         Text(
                           config.companyName,
                           style: TextStyle(
-                            fontSize: screenWidth * 0.075,
+                            fontSize: screenWidth * 0.045,
                             fontWeight: FontWeight.bold,
                             color: textColor,
                           ),

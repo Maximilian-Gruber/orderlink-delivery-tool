@@ -17,4 +17,4 @@ class TenantData(Base):
     maxEmployees = Column(Integer, default=3)
 
     enabledModules = relationship("EnabledModule", back_populates="tenantData")
-    siteConfig = relationship("SiteConfig", uselist=False, back_populates="tenant")
+    #siteConfig = relationship("SiteConfig", uselist=False, back_populates="tenant")

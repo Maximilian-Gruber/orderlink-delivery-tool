@@ -4,10 +4,10 @@ from datetime import datetime
 from app.database import Base
 
 class SiteConfig(Base):
-    __tablename__ = "site_configs"
+    __tablename__ = "SiteConfig"
 
     siteConfigId = Column(String, primary_key=True)
-    tenantId = Column(String, ForeignKey("tenant_data.tenantId"), unique=True, nullable=True)
+    #tenantId = Column(String, ForeignKey("tenant_data.tenantId"), unique=True, nullable=True)
 
     companyName = Column(String, nullable=False)
     logoPath = Column(String, nullable=True)
@@ -18,5 +18,5 @@ class SiteConfig(Base):
     addressId = Column(String, ForeignKey("addresses.addressId"))
     modifiedAt = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
-    tenant = relationship("TenantData", back_populates="siteConfig")
+    #tenant = relationship("TenantData", back_populates="siteConfig")
     address = relationship("Address")
