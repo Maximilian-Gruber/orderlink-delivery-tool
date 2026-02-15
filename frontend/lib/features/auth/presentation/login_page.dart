@@ -122,6 +122,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                 Padding(
                   padding: EdgeInsets.only(bottom: screenWidth * 0.04),
                   child: Text(
+                    textAlign: TextAlign.center,
                     loc.loginError,
                     style: TextStyle(color: theme.colorScheme.error, fontSize: screenWidth * 0.04),
                   ),
