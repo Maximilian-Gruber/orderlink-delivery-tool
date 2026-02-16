@@ -17,3 +17,11 @@ class RouteCRUD:
                 joinedload(Order.products).joinedload(OrderOnProducts.product)
             )
         ).all()
+    
+    def get_orders_per_route(db: Session, routeId: str):
+        return db.query(Route).filter(Route.routeId == routeId).options(
+            joinedload(Route.orders).joinedload(RoutesOnOrders.order).options(
+                joinedload(Order.customer).joinedload(Customer.address),
+                joinedload(Order.products).joinedload(OrderOnProducts.product)
+            )
+        ).first()
