@@ -3,7 +3,7 @@ from .database import engine, Base
 from .routers import auth, site_config, route
 import app.models
 
-#Base.metadata.create_all(bind=engine)
+Base.metadata.create_all(bind=engine)
 
 app = FastAPI(title="FastAPI + Postgres (Docker Safe Setup)")
 
