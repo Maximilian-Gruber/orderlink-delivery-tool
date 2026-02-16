@@ -3,46 +3,42 @@ import 'package:flutter/material.dart';
 class AppTheme {
   AppTheme._();
 
-  // Light Theme
   static final ThemeData lightTheme = ThemeData(
     brightness: Brightness.light,
-    scaffoldBackgroundColor: Colors.white,
+    scaffoldBackgroundColor: const Color(0xFFF5F5F5),
     primaryColor: Colors.black,
     appBarTheme: const AppBarTheme(
       backgroundColor: Colors.white,
       foregroundColor: Colors.black,
       elevation: 0,
+      centerTitle: true,
+      titleTextStyle: TextStyle(color: Colors.black, fontSize: 20, fontWeight: FontWeight.bold),
     ),
+    cardTheme: CardThemeData(
+      color: Colors.white,
+      elevation: 0,
+      shape: RoundedRectangleBorder(
+        side: const BorderSide(color: Colors.black12, width: 1),
+        borderRadius: BorderRadius.circular(12),
+      ),
+    ),
+    iconTheme: const IconThemeData(color: Colors.black),
+    dividerColor: Colors.black12,
     elevatedButtonTheme: ElevatedButtonThemeData(
       style: ElevatedButton.styleFrom(
-        backgroundColor: Colors.black,
-        foregroundColor: Colors.white,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(8),
-        ),
-        textStyle: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+        elevation: 0,
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+        textStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
       ),
-    ),
-    inputDecorationTheme: InputDecorationTheme(
-      labelStyle: const TextStyle(color: Colors.black54),
-      border: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(8),
-      ),
-      focusedBorder: const OutlineInputBorder(
-        borderSide: BorderSide(color: Colors.black, width: 2),
-      ),
-    ),
-    textTheme: const TextTheme(
-      bodyMedium: TextStyle(color: Colors.black),
     ),
     colorScheme: const ColorScheme.light(
       primary: Colors.black,
-      background: Colors.white,
-      error: Colors.red,
+      secondary: Colors.black54,
+      surface: Colors.white,
+      background: Color(0xFFF5F5F5),
     ),
   );
 
-  // Dark Theme
   static final ThemeData darkTheme = ThemeData(
     brightness: Brightness.dark,
     scaffoldBackgroundColor: Colors.black,
@@ -51,33 +47,24 @@ class AppTheme {
       backgroundColor: Colors.black,
       foregroundColor: Colors.white,
       elevation: 0,
+      centerTitle: true,
+      titleTextStyle: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold),
     ),
-    elevatedButtonTheme: ElevatedButtonThemeData(
-      style: ElevatedButton.styleFrom(
-        backgroundColor: Colors.white,
-        foregroundColor: Colors.black,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(8),
-        ),
-        textStyle: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+    cardTheme: CardThemeData(
+      color: const Color(0xFF1A1A1A),
+      elevation: 0,
+      shape: RoundedRectangleBorder(
+        side: const BorderSide(color: Colors.white10, width: 1),
+        borderRadius: BorderRadius.circular(12),
       ),
     ),
-    inputDecorationTheme: InputDecorationTheme(
-      labelStyle: const TextStyle(color: Colors.white70),
-      border: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(8),
-      ),
-      focusedBorder: const OutlineInputBorder(
-        borderSide: BorderSide(color: Colors.white, width: 2),
-      ),
-    ),
-    textTheme: const TextTheme(
-      bodyMedium: TextStyle(color: Colors.white),
-    ),
+    iconTheme: const IconThemeData(color: Colors.white),
+    dividerColor: Colors.white10,
     colorScheme: const ColorScheme.dark(
       primary: Colors.white,
+      secondary: Colors.white54,
+      surface: Color(0xFF1A1A1A),
       background: Colors.black,
-      error: Colors.red,
     ),
   );
 }

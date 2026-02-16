@@ -7,5 +7,6 @@
   "appName": "OrderLink",
   "openRoutes": "Offene Routen",
   "stops": "Stops",
-  "selectRoute": "Route auswählen"
+  "selectRoute": "Route auswählen",
+  "routeInfo": "Info"
 }

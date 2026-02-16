@@ -31,4 +31,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get selectRoute => 'Select Route';
+
+  @override
+  String get routeInfo => 'Info';
 }

@@ -142,6 +142,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Select Route'**
   String get selectRoute;
+
+  /// No description provided for @routeInfo.
+  ///
+  /// In en, this message translates to:
+  /// **'Info'**
+  String get routeInfo;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

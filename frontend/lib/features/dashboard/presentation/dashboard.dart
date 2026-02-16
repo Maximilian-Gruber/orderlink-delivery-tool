@@ -13,21 +13,34 @@ class DashboardPage extends ConsumerWidget {
     final controller = ref.read(dashboardControllerProvider.notifier);
     final loc = AppLocalizations.of(context)!;
     final authController = ref.read(authControllerProvider.notifier);
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    final screenWidth = MediaQuery.of(context).size.width;
+    final paddingStandard = screenWidth * 0.04;
+    final titleFontSize = screenWidth * 0.04;
+    final subtitleFontSize = screenWidth * 0.03;
+    final buttonHeight = screenWidth * 0.12;
+    final iconSize = screenWidth * 0.06;
 
     if (state.loading && state.routes.isEmpty) {
-      return const Scaffold(body: Center(child: CircularProgressIndicator()));
+      return Scaffold(
+        body: Center(
+          child: CircularProgressIndicator(
+            color: isDark ? Colors.white : Colors.black,
+          ),
+        ),
+      );
     }
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(loc.openRoutes),
+        title: Text(
+          loc.openRoutes.toUpperCase(),
+          style: TextStyle(fontSize: titleFontSize, letterSpacing: 1.2),
+        ),
         actions: [
           IconButton(
-            icon: const Icon(Icons.refresh),
-            onPressed: () => controller.refresh(),
-          ),
-          IconButton(
-            icon: const Icon(Icons.logout, color: Colors.redAccent),
+            icon: Icon(Icons.person, size: iconSize * 1),
             onPressed: () => authController.logout(),
           ),
         ],
@@ -35,66 +48,116 @@ class DashboardPage extends ConsumerWidget {
       body: state.error != null
           ? Center(child: Text(state.error!))
           : RefreshIndicator(
+              color: isDark ? Colors.white : Colors.black,
               onRefresh: () => controller.refresh(),
               child: ListView.builder(
-                padding: const EdgeInsets.all(8.0),
+                padding: EdgeInsets.all(paddingStandard * 0.75),
                 itemCount: state.routes.length,
                 itemBuilder: (context, index) {
                   final route = state.routes[index];
                   
                   return Card(
                     key: ValueKey(route.routeId),
-                    elevation: 2,
-                    margin: const EdgeInsets.only(bottom: 12.0),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12.0),
-                    ),
+                    margin: EdgeInsets.only(bottom: paddingStandard),
                     clipBehavior: Clip.antiAlias,
                     child: Theme(
                       data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
                       child: ExpansionTile(
-                        leading: const Icon(Icons.local_shipping_outlined, color: Colors.blue),
+                        leading: Icon(
+                          Icons.local_shipping, 
+                          color: isDark ? Colors.white : Colors.black,
+                          size: iconSize,
+                        ),
                         title: Text(
                           route.routeName,
-                          style: const TextStyle(fontWeight: FontWeight.bold),
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold, 
+                            fontSize: titleFontSize,
+                            letterSpacing: 0.5,
+                          ),
                         ),
-                        subtitle: Text("${route.customers.length} ${loc.stops}"),
+                        subtitle: Text(
+                          "${route.customers.length} ${loc.stops}",
+                          style: TextStyle(fontSize: subtitleFontSize),
+                        ),
                         children: [
                           const Divider(height: 1),
                           ...route.customers.map((customer) => ListTile(
-                            leading: const Icon(Icons.person_pin_circle_outlined, color: Colors.orange),
-                            title: Text(customer.customerName),
-                            subtitle: Text(
-                              "${customer.streetName} ${customer.streetNumber}\n${customer.postCode} ${customer.city}",
+                            leading: Icon(
+                              Icons.location_on_outlined, 
+                              size: iconSize * 0.8, 
+                              color: isDark ? Colors.white70 : Colors.black54,
                             ),
-                            isThreeLine: true,
+                            title: Text(
+                              customer.customerName, 
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: subtitleFontSize * 1.1,
+                              ),
+                            ),
+                            subtitle: Text(
+                              "${customer.streetName} ${customer.streetNumber}, ${customer.postCode} ${customer.city}",
+                              style: TextStyle(fontSize: subtitleFontSize),
+                            ),
                           )),
                           
                           Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+                            padding: EdgeInsets.fromLTRB(
+                              paddingStandard, 
+                              paddingStandard * 0.5, 
+                              paddingStandard, 
+                              paddingStandard,
+                            ),
                             child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
-                                IconButton(
-                                  icon: const Icon(Icons.info_outline, color: Colors.blue),
-                                  onPressed: () {
-                                    // Todo: Info Logik
-                                  },
-                                ),
-                                
-                                ElevatedButton.icon(
-                                  onPressed: () {
-                                    // Todo: Route Starten Logik
-                                  },
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: Colors.green,
-                                    foregroundColor: Colors.white,
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(8),
+                                Expanded(
+                                  child: SizedBox(
+                                    height: buttonHeight,
+                                    child: ElevatedButton.icon(
+                                      onPressed: () {
+                                        // Todo: Info Logik
+                                      },
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor: Colors.blue.shade700,
+                                        foregroundColor: Colors.white,
+                                        elevation: 0,
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(screenWidth * 0.02),
+                                        ),
+                                        textStyle: TextStyle(
+                                          fontSize: screenWidth * 0.025,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                      icon: Icon(Icons.info_outline, size: iconSize * 0.7),
+                                      label: Text(loc.routeInfo.toUpperCase()),
                                     ),
                                   ),
-                                  icon: const Icon(Icons.play_arrow),
-                                  label: Text(loc.selectRoute),
+                                ),
+                                SizedBox(width: paddingStandard * 0.75),
+                                Expanded(
+                                  child: SizedBox(
+                                    height: buttonHeight,
+                                    child: ElevatedButton.icon(
+                                      onPressed: () {
+                                        // Todo: Start Logik
+                                      },
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor: Colors.green.shade700,
+                                        foregroundColor: Colors.white,
+                                        elevation: 0,
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(screenWidth * 0.02),
+                                        ),
+                                        textStyle: TextStyle(
+                                          fontSize: screenWidth * 0.025,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                      icon: Icon(Icons.play_arrow, size: iconSize * 0.7),
+                                      label: Text(loc.selectRoute.toUpperCase()),
+                                    ),
+                                  ),
                                 ),
                               ],
                             ),
