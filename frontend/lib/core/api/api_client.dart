@@ -1,23 +1,22 @@
 import 'package:dio/dio.dart';
-import 'package:flutter/foundation.dart'; // Für VoidCallback
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:frontend/core/config.dart';
 import '../storage/secure_storage.dart';
-// Importiere den AuthController, um die Logout-Methode aufzurufen
 import '../../features/auth/logic/auth_controller.dart'; 
 
 class ApiClient {
   final Dio dio;
   final SecureStorage storage;
-  final VoidCallback? onTokenExpired; // Callback für 401 Fehler
+  final VoidCallback? onTokenExpired;
 
   ApiClient({
     required this.storage,
     this.onTokenExpired,
   }) : dio = Dio(BaseOptions(
           baseUrl: AppConfig.baseUrl,
-          connectTimeout: const Duration(seconds: 5),
-          receiveTimeout: const Duration(seconds: 3),
+          connectTimeout: const Duration(seconds: 10),
+          receiveTimeout: const Duration(seconds: 7),
         )) {
     
     dio.interceptors.add(
@@ -31,11 +30,9 @@ class ApiClient {
         },
         onError: (DioException e, handler) async {
           if (e.response?.statusCode == 401) {
-            // 1. Speicher löschen
             await storage.clear();
             print("Token abgelaufen - Trigger Logout");
             
-            // 2. AuthController benachrichtigen (falls Callback gesetzt)
             if (onTokenExpired != null) {
               onTokenExpired!();
             }
@@ -55,15 +52,12 @@ class ApiClient {
   }
 }
 
-// Der Provider verknüpft nun ApiClient und AuthController
 final apiClientProvider = Provider<ApiClient>((ref) {
   final storage = SecureStorage();
   
   return ApiClient(
     storage: storage,
     onTokenExpired: () {
-      // Hier schließen wir den Kreis: Bei 401 wird ausgeloggt.
-      // Der Router (app_router.dart) merkt das sofort und redirectet zum Login.
       ref.read(authControllerProvider.notifier).logout();
     },
   );

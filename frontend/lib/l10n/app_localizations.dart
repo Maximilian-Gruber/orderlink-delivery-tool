@@ -10,6 +10,8 @@ import 'app_localizations_en.dart';
 
 // ignore_for_file: type=lint
 
+// flutter gen-l10n
+
 /// Callers can lookup localized strings with an instance of AppLocalizations
 /// returned by `AppLocalizations.of(context)`.
 ///

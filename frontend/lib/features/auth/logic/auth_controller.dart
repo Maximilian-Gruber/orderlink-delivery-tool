@@ -25,13 +25,10 @@ class AuthController extends StateNotifier<AuthState> {
   final Ref ref;
   late final SecureStorage storage;
   late final AuthApi api;
-  // SiteConfigApi initialisieren wir nicht hier drin, da es eine einmalige Sache ist
 
   AuthController(this.ref) : super(AuthState()) {
     storage = SecureStorage();
     
-    // WICHTIG: Wir nutzen den zentralen Client aus dem Provider!
-    // Dadurch greift auch hier der Interceptor Logik.
     final client = ref.read(apiClientProvider);
     api = AuthApi(client);
     
@@ -58,8 +55,6 @@ class AuthController extends StateNotifier<AuthState> {
 
   Future<void> logout() async {
     await storage.clear();
-    // Setze den Token auf null.
-    // Da app_router.dart auf diesen State hört, erfolgt der Redirect automatisch.
     state = AuthState(); 
   }
 }
@@ -71,7 +66,6 @@ final authControllerProvider =
 
 final siteConfigProvider =
     FutureProvider<SiteConfigLoginPage>((ref) async {
-  // Auch hier den Provider nutzen für Konsistenz
   final apiClient = ref.watch(apiClientProvider);
   final api = SiteConfigApi(apiClient);
 

@@ -50,7 +50,6 @@ class DashboardController extends StateNotifier<DashboardState> {
     final token = ref.read(authControllerProvider).token;
     if (token == null) return;
 
-    // WICHTIG: Wir löschen den alten Error beim Neustart des Versuchs
     state = state.copyWith(loading: true, error: null);
     
     try {
