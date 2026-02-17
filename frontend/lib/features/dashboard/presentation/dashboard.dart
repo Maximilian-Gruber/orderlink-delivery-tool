@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:frontend/features/auth/logic/auth_controller.dart';
 import 'package:frontend/features/dashboard/models/route_model.dart';
@@ -205,7 +206,7 @@ class _RouteCard extends StatelessWidget {
                     label: loc.selectRoute.toUpperCase(),
                     icon: Icons.play_arrow,
                     color: theme.colorScheme.tertiary,
-                    onPressed: () {},
+                    onPressed: () {HapticFeedback.lightImpact();},
                     height: screenWidth * 0.12,
                     fontSize: screenWidth * 0.025,
                   ),
