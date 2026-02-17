@@ -57,6 +57,15 @@ class DashboardController extends StateNotifier<DashboardState> {
   Future<void> refresh() async {
     await fetchRoutes();
   }
+
+  Future<RouteOrders?> getRouteDetails(String routeId) async {
+    try {
+      return await _api.fetchRouteOrders(routeId);
+    } catch (e) {
+      return null;
+    }
+  }
+
 }
 
 final dashboardControllerProvider =

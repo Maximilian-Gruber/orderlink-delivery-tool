@@ -34,4 +34,13 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get routeInfo => 'Info';
+
+  @override
+  String get close => 'Close';
+
+  @override
+  String get errorWhileLoading => 'Error while loading';
+
+  @override
+  String get details => 'Details';
 }

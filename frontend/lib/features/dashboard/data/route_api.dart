@@ -16,4 +16,9 @@ class RouteApi {
       throw Exception('Fehler beim Laden der Routen: ${e.message}');
     }
   }
+
+  Future<RouteOrders> fetchRouteOrders(String routeId) async {
+    final response = await client.get('/routes/$routeId/orders');
+    return RouteOrders.fromJson(response.data);
+}
 }

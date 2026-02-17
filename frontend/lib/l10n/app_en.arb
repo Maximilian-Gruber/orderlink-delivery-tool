@@ -8,6 +8,8 @@
   "openRoutes": "Open Routes",
   "stops": "Stops",
   "selectRoute": "Select Route",
-  "routeInfo": "Info"
-
+  "routeInfo": "Info",
+  "close": "Close",
+  "errorWhileLoading": "Error while loading",
+  "details": "Details"
 }

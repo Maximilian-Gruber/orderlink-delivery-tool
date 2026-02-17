@@ -39,3 +39,79 @@ class CustomerAddress {
     );
   }
 }
+
+class RouteOrders {
+  final String routeId;
+  final String routeName;
+  final List<RouteOrder> orders;
+
+  RouteOrders({
+    required this.routeId,
+    required this.routeName,
+    required this.orders,
+  });
+
+  factory RouteOrders.fromJson(Map<String, dynamic> json) {
+    return RouteOrders(
+      routeId: json['routeId'] ?? '',
+      routeName: json['routeName'] ?? '',
+      orders: (json['orders'] as List? ?? [])
+          .map((o) => RouteOrder.fromJson(o))
+          .toList(),
+    );
+  }
+}
+
+class RouteOrder {
+  final String orderId;
+  final String customerName;
+  final String streetName;
+  final String streetNumber;
+  final String postCode;
+  final String city;
+  final List<ProductSimple> products;
+
+  RouteOrder({
+    required this.orderId,
+    required this.customerName,
+    required this.streetName,
+    required this.streetNumber,
+    required this.postCode,
+    required this.city,
+    required this.products,
+  });
+
+  factory RouteOrder.fromJson(Map<String, dynamic> json) {
+    return RouteOrder(
+      orderId: json['orderId'] ?? '',
+      customerName: json['customerName'] ?? '',
+      streetName: json['streetName'] ?? '',
+      streetNumber: json['streetNumber'] ?? '',
+      postCode: json['postCode'] ?? '',
+      city: json['city'] ?? '',
+      products: (json['products'] as List? ?? [])
+          .map((p) => ProductSimple.fromJson(p))
+          .toList(),
+    );
+  }
+}
+
+class ProductSimple {
+  final String productName;
+  final int amount;
+  final double price;
+
+  ProductSimple({
+    required this.productName,
+    required this.amount,
+    required this.price,
+  });
+
+  factory ProductSimple.fromJson(Map<String, dynamic> json) {
+    return ProductSimple(
+      productName: json['productName'] ?? '',
+      amount: json['amount'] ?? 0,
+      price: (json['price'] ?? 0.0).toDouble(),
+    );
+  }
+}

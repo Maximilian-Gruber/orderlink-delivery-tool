@@ -14,6 +14,8 @@ class AppTheme {
       centerTitle: true,
       titleTextStyle: TextStyle(color: Colors.black, fontSize: 20, fontWeight: FontWeight.bold),
     ),
+    dividerTheme: const DividerThemeData(color: Colors.black12, thickness: 1),
+    progressIndicatorTheme: const ProgressIndicatorThemeData(color: Colors.black),
     cardTheme: CardThemeData(
       color: Colors.white,
       elevation: 0,
@@ -23,17 +25,19 @@ class AppTheme {
       ),
     ),
     iconTheme: const IconThemeData(color: Colors.black),
-    dividerColor: Colors.black12,
     elevatedButtonTheme: ElevatedButtonThemeData(
       style: ElevatedButton.styleFrom(
         elevation: 0,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-        textStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+        textStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, inherit: false),
       ),
     ),
     colorScheme: const ColorScheme.light(
       primary: Colors.black,
-      secondary: Colors.black54,
+      onPrimary: Colors.white,
+      secondary: Color(0xFF1976D2), 
+      tertiary: Color(0xFF388E3C),   
       surface: Colors.white,
       background: Color(0xFFF5F5F5),
     ),
@@ -50,6 +54,8 @@ class AppTheme {
       centerTitle: true,
       titleTextStyle: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold),
     ),
+    dividerTheme: const DividerThemeData(color: Colors.white10, thickness: 1),
+    progressIndicatorTheme: const ProgressIndicatorThemeData(color: Colors.white),
     cardTheme: CardThemeData(
       color: const Color(0xFF1A1A1A),
       elevation: 0,
@@ -59,10 +65,19 @@ class AppTheme {
       ),
     ),
     iconTheme: const IconThemeData(color: Colors.white),
-    dividerColor: Colors.white10,
+    elevatedButtonTheme: ElevatedButtonThemeData(
+      style: ElevatedButton.styleFrom(
+        elevation: 0,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+        textStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, inherit: false),
+      ),
+    ),
     colorScheme: const ColorScheme.dark(
       primary: Colors.white,
-      secondary: Colors.white54,
+      onPrimary: Colors.black,
+      secondary: Color(0xFF42A5F5),
+      tertiary: Color(0xFF66BB6A),
       surface: Color(0xFF1A1A1A),
       background: Colors.black,
     ),

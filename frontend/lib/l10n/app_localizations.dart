@@ -148,6 +148,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Info'**
   String get routeInfo;
+
+  /// No description provided for @close.
+  ///
+  /// In en, this message translates to:
+  /// **'Close'**
+  String get close;
+
+  /// No description provided for @errorWhileLoading.
+  ///
+  /// In en, this message translates to:
+  /// **'Error while loading'**
+  String get errorWhileLoading;
+
+  /// No description provided for @details.
+  ///
+  /// In en, this message translates to:
+  /// **'Details'**
+  String get details;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {
