@@ -43,4 +43,13 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get details => 'Details';
+
+  @override
+  String get search => 'Search';
+
+  @override
+  String get noRoutesFound => 'No routes found';
+
+  @override
+  String get error => 'Error';
 }

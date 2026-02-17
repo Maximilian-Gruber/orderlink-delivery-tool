@@ -3,27 +3,34 @@ import 'package:frontend/core/api/api_client.dart';
 import 'package:frontend/features/auth/logic/auth_controller.dart';
 import '../data/route_api.dart';
 import '../models/route_model.dart';
-import '../../auth/logic/auth_controller.dart';
 
 class DashboardState {
   final bool loading;
-  final List<RouteCustomers> routes;
+  final List<RouteCustomers> allRoutes;
+  final List<RouteCustomers> filteredRoutes;
+  final String searchQuery;
   final String? error;
 
   DashboardState({
     this.loading = false,
-    this.routes = const [],
+    this.allRoutes = const [],
+    this.filteredRoutes = const [],
+    this.searchQuery = '',
     this.error,
   });
 
   DashboardState copyWith({
     bool? loading,
-    List<RouteCustomers>? routes,
+    List<RouteCustomers>? allRoutes,
+    List<RouteCustomers>? filteredRoutes,
+    String? searchQuery,
     String? error,
   }) {
     return DashboardState(
       loading: loading ?? this.loading,
-      routes: routes ?? this.routes,
+      allRoutes: allRoutes ?? this.allRoutes,
+      filteredRoutes: filteredRoutes ?? this.filteredRoutes,
+      searchQuery: searchQuery ?? this.searchQuery,
       error: error ?? this.error,
     );
   }
@@ -45,13 +52,33 @@ class DashboardController extends StateNotifier<DashboardState> {
     state = state.copyWith(loading: true, error: null);
     try {
       final routes = await _api.fetchActiveRoutes();
-      state = state.copyWith(routes: routes, loading: false);
-    } catch (e) {
       state = state.copyWith(
-        error: "Fehler: $e",
+        allRoutes: routes,
+        filteredRoutes: routes,
         loading: false,
       );
+      if (state.searchQuery.isNotEmpty) {
+        updateSearch(state.searchQuery);
+      }
+    } catch (e) {
+      state = state.copyWith(error: "Error: $e", loading: false);
     }
+  }
+
+  void updateSearch(String query) {
+    if (query.isEmpty) {
+      state = state.copyWith(searchQuery: query, filteredRoutes: state.allRoutes);
+      return;
+    }
+
+    final filtered = state.allRoutes.where((route) {
+      final matchesRoute = route.routeName.toLowerCase().contains(query.toLowerCase());
+      final matchesCustomer = route.customers.any(
+          (c) => c.customerName.toLowerCase().contains(query.toLowerCase()));
+      return matchesRoute || matchesCustomer;
+    }).toList();
+
+    state = state.copyWith(searchQuery: query, filteredRoutes: filtered);
   }
 
   Future<void> refresh() async {
@@ -65,7 +92,6 @@ class DashboardController extends StateNotifier<DashboardState> {
       return null;
     }
   }
-
 }
 
 final dashboardControllerProvider =

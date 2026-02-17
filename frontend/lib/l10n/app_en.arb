@@ -11,5 +11,8 @@
   "routeInfo": "Info",
   "close": "Close",
   "errorWhileLoading": "Error while loading",
-  "details": "Details"
+  "details": "Details",
+  "search": "Search",
+  "noRoutesFound": "No routes found",
+  "error": "Error"
 }

@@ -11,5 +11,8 @@
   "routeInfo": "Info",
   "close": "Schließen",
   "errorWhileLoading": "Fehler beim Laden",
-  "details": "Details"
+  "details": "Details", 
+  "search": "Suchen",
+  "noRoutesFound": "Keine Routen gefunden",
+  "error": "Fehler"
 }
