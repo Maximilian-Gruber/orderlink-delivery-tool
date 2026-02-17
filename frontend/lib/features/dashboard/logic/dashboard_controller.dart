@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:frontend/core/api/api_client.dart';
 import 'package:frontend/features/auth/logic/auth_controller.dart';
+import 'package:dio/dio.dart';
 import '../data/route_api.dart';
 import '../models/route_model.dart';
 
@@ -49,28 +50,36 @@ class DashboardController extends StateNotifier<DashboardState> {
     final token = ref.read(authControllerProvider).token;
     if (token == null) return;
 
+    // WICHTIG: Wir löschen den alten Error beim Neustart des Versuchs
     state = state.copyWith(loading: true, error: null);
+    
     try {
       final routes = await _api.fetchActiveRoutes();
+      
       state = state.copyWith(
         allRoutes: routes,
         filteredRoutes: routes,
         loading: false,
+        error: null, 
       );
+
       if (state.searchQuery.isNotEmpty) {
         updateSearch(state.searchQuery);
       }
+    } on DioException catch (e) {
+      print("Dio Error: ${e.message}");
+      String errorKey = (e.type == DioExceptionType.connectionTimeout || 
+                         e.type == DioExceptionType.receiveTimeout) 
+                         ? "timeout" : "load_error";
+      
+      state = state.copyWith(error: errorKey, loading: false);
     } catch (e) {
-      state = state.copyWith(error: "Error: $e", loading: false);
+      print("General Error: $e"); 
+      state = state.copyWith(error: "load_error", loading: false);
     }
   }
 
   void updateSearch(String query) {
-    if (query.isEmpty) {
-      state = state.copyWith(searchQuery: query, filteredRoutes: state.allRoutes);
-      return;
-    }
-
     final filtered = state.allRoutes.where((route) {
       final matchesRoute = route.routeName.toLowerCase().contains(query.toLowerCase());
       final matchesCustomer = route.customers.any(
@@ -81,9 +90,7 @@ class DashboardController extends StateNotifier<DashboardState> {
     state = state.copyWith(searchQuery: query, filteredRoutes: filtered);
   }
 
-  Future<void> refresh() async {
-    await fetchRoutes();
-  }
+  Future<void> refresh() async => await fetchRoutes();
 
   Future<RouteOrders?> getRouteDetails(String routeId) async {
     try {

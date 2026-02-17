@@ -14,5 +14,7 @@
   "details": "Details", 
   "search": "Suchen",
   "noRoutesFound": "Keine Routen gefunden",
-  "error": "Fehler"
+  "error": "Fehler",
+  "errorTimeout": "Die Anfrage hat zu lange gedauert",
+  "retry": "Erneut versuchen"
 }

@@ -19,7 +19,6 @@ class DashboardPage extends ConsumerWidget {
 
     final screenWidth = MediaQuery.of(context).size.width;
     final paddingStandard = screenWidth * 0.04;
-    final iconSize = screenWidth * 0.06;
 
     return Scaffold(
       appBar: AppBar(
@@ -29,7 +28,7 @@ class DashboardPage extends ConsumerWidget {
         ),
         actions: [
           IconButton(
-            icon: Icon(Icons.person, size: iconSize),
+            icon: Icon(Icons.person, size: screenWidth * 0.06),
             onPressed: () => authController.logout(),
           ),
         ],
@@ -55,32 +54,45 @@ class DashboardPage extends ConsumerWidget {
           ),
 
           Expanded(
-            child: state.error != null
-                ? Center(child: Text(state.error!))
-                : state.loading && state.allRoutes.isEmpty
-                    ? _buildSkeletonList(paddingStandard)
-                    : RefreshIndicator(
-                        onRefresh: () => controller.refresh(),
-                        child: state.filteredRoutes.isEmpty
-                            ? _buildEmptyState(loc, theme)
-                            : ListView.builder(
-                                padding: EdgeInsets.symmetric(horizontal: paddingStandard),
-                                itemCount: state.filteredRoutes.length,
-                                itemBuilder: (context, index) {
-                                  final route = state.filteredRoutes[index];
-                                  return _RouteCard(
-                                    key: ValueKey("${route.routeId}_$brightness"),
-                                    route: route,
-                                    controller: controller,
-                                    loc: loc,
-                                    theme: theme,
-                                    screenWidth: screenWidth,
-                                  );
-                                },
-                              ),
-                      ),
+            child: _buildMainContent(state, controller, loc, theme, paddingStandard, brightness, screenWidth),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildMainContent(DashboardState state, DashboardController controller, AppLocalizations loc, ThemeData theme, double padding, Brightness brightness, double screenWidth) {
+    if (state.loading && state.allRoutes.isEmpty) {
+      return _buildSkeletonList(padding);
+    }
+
+    if (state.error != null && state.allRoutes.isEmpty) {
+      return _buildErrorState(state.error!, controller, theme, loc);
+    }
+
+    if (state.filteredRoutes.isEmpty) {
+      return RefreshIndicator(
+        onRefresh: () => controller.refresh(),
+        child: _buildEmptyState(loc, theme),
+      );
+    }
+
+    return RefreshIndicator(
+      onRefresh: () => controller.refresh(),
+      child: ListView.builder(
+        padding: EdgeInsets.symmetric(horizontal: padding),
+        itemCount: state.filteredRoutes.length,
+        itemBuilder: (context, index) {
+          final route = state.filteredRoutes[index];
+          return _RouteCard(
+            key: ValueKey("${route.routeId}_$brightness"),
+            route: route,
+            controller: controller,
+            loc: loc,
+            theme: theme,
+            screenWidth: screenWidth,
+          );
+        },
       ),
     );
   }
@@ -93,10 +105,34 @@ class DashboardPage extends ConsumerWidget {
     );
   }
 
+  Widget _buildErrorState(String errorKey, DashboardController controller, ThemeData theme, AppLocalizations loc) {
+    final displayMsg = errorKey == "timeout" ? loc.errorTimeout : loc.errorWhileLoading;
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(32.0),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(Icons.error_outline, size: 64, color: theme.colorScheme.error),
+            const SizedBox(height: 16),
+            Text(displayMsg, textAlign: TextAlign.center, style: const TextStyle(fontWeight: FontWeight.bold)),
+            const SizedBox(height: 24),
+            ElevatedButton.icon(
+              onPressed: () => controller.refresh(),
+              icon: const Icon(Icons.refresh),
+              label: Text(loc.retry.toUpperCase()),
+            )
+          ],
+        ),
+      ),
+    );
+  }
+
   Widget _buildEmptyState(AppLocalizations loc, ThemeData theme) {
     return ListView(
+      physics: const AlwaysScrollableScrollPhysics(),
       children: [
-        SizedBox(height: 100),
+        const SizedBox(height: 100),
         Center(
           child: Column(
             children: [
@@ -159,7 +195,7 @@ class _RouteCard extends StatelessWidget {
                   _ActionButton(
                     label: loc.routeInfo.toUpperCase(),
                     icon: Icons.info_outline,
-                    color: Colors.blue,
+                    color: theme.colorScheme.secondary,
                     onPressed: () => _showRouteInfoDialog(context, route.routeId, route.routeName, controller, loc),
                     height: screenWidth * 0.12,
                     fontSize: screenWidth * 0.025,
@@ -168,7 +204,7 @@ class _RouteCard extends StatelessWidget {
                   _ActionButton(
                     label: loc.selectRoute.toUpperCase(),
                     icon: Icons.play_arrow,
-                    color: Colors.green,
+                    color: theme.colorScheme.tertiary,
                     onPressed: () {},
                     height: screenWidth * 0.12,
                     fontSize: screenWidth * 0.025,

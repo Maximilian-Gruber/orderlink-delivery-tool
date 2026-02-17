@@ -1,6 +1,5 @@
 import '../../../../core/api/api_client.dart';
 import '../models/route_model.dart';
-import 'package:dio/dio.dart';
 
 class RouteApi {
   final ApiClient client;
@@ -9,16 +8,19 @@ class RouteApi {
   Future<List<RouteCustomers>> fetchActiveRoutes() async {
     try {
       final response = await client.get('/routes/active-routes-with-orders-products');
+      
+      if (response.data == null) return [];
+      
       return (response.data as List)
           .map((e) => RouteCustomers.fromJson(e))
           .toList();
-    } on DioException catch (e) {
-      throw Exception('Fehler beim Laden der Routen: ${e.message}');
+    } catch (e) {
+      rethrow;
     }
   }
 
   Future<RouteOrders> fetchRouteOrders(String routeId) async {
     final response = await client.get('/routes/$routeId/orders');
     return RouteOrders.fromJson(response.data);
-}
+  }
 }

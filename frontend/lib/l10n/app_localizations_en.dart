@@ -52,4 +52,10 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get error => 'Error';
+
+  @override
+  String get errorTimeout => 'The request took too long';
+
+  @override
+  String get retry => 'Retry';
 }

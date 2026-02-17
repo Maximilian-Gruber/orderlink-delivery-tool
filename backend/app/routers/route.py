@@ -6,12 +6,19 @@ from app.schemas.route import RouteSimple, RouteOrders
 from app.crud.route import RouteCRUD
 from app.dependencies.auth import get_current_user
 from app.models.employee import Employees
+import time
 
 router = APIRouter(prefix="/routes", tags=["routes"])
 
 @router.get("/active-routes-with-orders-products", response_model=list[RouteSimple])
 def get_logistics_overview(db: Session = Depends(get_db), current_user: Employees = Depends(get_current_user)):
     routes = RouteCRUD.get_active_routes_with_orders(db)
+
+    if not routes:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="No active routes found"
+        )
     
     result = []
     for r in routes:
@@ -40,12 +47,9 @@ def get_logistics_overview(db: Session = Depends(get_db), current_user: Employee
 
 @router.get("/{routeId}/orders", response_model=RouteOrders)
 def get_orders_per_route(routeId: str, db: Session = Depends(get_db), current_user: Employees = Depends(get_current_user)):
-    # Achtung: Aufruf korrigieren, falls Methode statisch ist, oder Instanz nutzen
-    # Im CRUD Code oben war es als statische Methode definiert (kein self), daher:
     route = RouteCRUD.get_orders_per_route(db, routeId)
-    
+
     if not route:
-        # HIER IST DIE ÄNDERUNG: Exception statt return None
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail=f"Route with id {routeId} not found"
@@ -72,7 +76,6 @@ def get_orders_per_route(routeId: str, db: Session = Depends(get_db), current_us
                 } for op in o.products
             ]
         })
-    
     return {
         "routeId": route.routeId,
         "routeName": route.name,

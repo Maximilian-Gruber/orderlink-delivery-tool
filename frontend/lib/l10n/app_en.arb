@@ -14,5 +14,7 @@
   "details": "Details",
   "search": "Search",
   "noRoutesFound": "No routes found",
-  "error": "Error"
+  "error": "Error",
+  "errorTimeout": "The request took too long",
+  "retry": "Retry"
 }

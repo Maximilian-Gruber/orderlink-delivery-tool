@@ -52,4 +52,10 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get error => 'Fehler';
+
+  @override
+  String get errorTimeout => 'Die Anfrage hat zu lange gedauert';
+
+  @override
+  String get retry => 'Erneut versuchen';
 }
