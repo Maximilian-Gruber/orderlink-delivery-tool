@@ -34,6 +34,16 @@ class _LoginPageState extends ConsumerState<LoginPage> {
     final fieldWidth = screenWidth * 0.9;
     final loc = AppLocalizations.of(context)!;
     
+    ref.listen<AuthState>(authControllerProvider, (previous, next) {
+      if (next.error != null && next.error!.isNotEmpty) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(loc.loginError, textAlign: TextAlign.center),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    });
 
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
@@ -116,17 +126,6 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                 ),
               ),
               SizedBox(height: screenWidth * 0.06),
-
-              // Error Message
-              if (state.error != null)
-                Padding(
-                  padding: EdgeInsets.only(bottom: screenWidth * 0.04),
-                  child: Text(
-                    textAlign: TextAlign.center,
-                    loc.loginError,
-                    style: TextStyle(color: theme.colorScheme.error, fontSize: screenWidth * 0.04),
-                  ),
-                ),
 
               // Login Button
               SizedBox(

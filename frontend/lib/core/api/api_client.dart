@@ -31,7 +31,6 @@ class ApiClient {
         onError: (DioException e, handler) async {
           if (e.response?.statusCode == 401) {
             await storage.clear();
-            print("Token abgelaufen - Trigger Logout");
             
             if (onTokenExpired != null) {
               onTokenExpired!();
