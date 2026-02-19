@@ -2,7 +2,7 @@
 services:
   db:
     image: postgres:16
-    container_name: postgres
+    container_name: orderlink-dev-db
     restart: unless-stopped
     shm_size: 1gb
     environment:
@@ -30,7 +30,7 @@ services:
 
   api:
     build: ./backend
-    container_name: fastapi
+    container_name: delivery-tool-api
     restart: unless-stopped
     env_file:
       - .env
