@@ -16,5 +16,10 @@
   "noRoutesFound": "Keine Routen gefunden",
   "error": "Fehler",
   "errorTimeout": "Die Anfrage hat zu lange gedauert",
-  "retry": "Erneut versuchen"
+  "retry": "Erneut versuchen",
+  "profile": "Profil",
+  "name": "Name",
+  "role": "Rolle",
+  "id": "ID",
+  "logout": "Abmelden"
 }

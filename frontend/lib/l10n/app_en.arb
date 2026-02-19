@@ -16,5 +16,10 @@
   "noRoutesFound": "No routes found",
   "error": "Error",
   "errorTimeout": "The request took too long",
-  "retry": "Retry"
+  "retry": "Retry",
+  "profile": "Profile",
+  "name": "Name",
+  "role": "Role",
+  "id": "ID",
+  "logout": "Logout"
 }

@@ -7,7 +7,7 @@ from app.schemas.employee import EmployeeOut
 from app.crud.employee import EmployeeCRUD
 from app.dependencies.auth import get_current_user
 
-router = APIRouter(prefix="/employee", tags=["employees"])
+router = APIRouter(prefix="/employees", tags=["employees"])
 
 @router.get("/profile", response_model=EmployeeOut)
 def get_employee_profile(db: Session = Depends(get_db), current_user: EmployeeOut = Depends(get_current_user)):

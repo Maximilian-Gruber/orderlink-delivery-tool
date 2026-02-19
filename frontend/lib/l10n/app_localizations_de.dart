@@ -58,4 +58,19 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get retry => 'Erneut versuchen';
+
+  @override
+  String get profile => 'Profil';
+
+  @override
+  String get name => 'Name';
+
+  @override
+  String get role => 'Rolle';
+
+  @override
+  String get id => 'ID';
+
+  @override
+  String get logout => 'Abmelden';
 }

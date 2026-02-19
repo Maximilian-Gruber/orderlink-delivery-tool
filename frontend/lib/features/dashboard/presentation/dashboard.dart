@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:frontend/features/auth/logic/auth_controller.dart';
 import 'package:frontend/features/dashboard/models/route_model.dart';
+import 'package:go_router/go_router.dart';
 import '../logic/dashboard_controller.dart';
 import '../../../l10n/app_localizations.dart';
 
@@ -30,7 +31,7 @@ class DashboardPage extends ConsumerWidget {
         actions: [
           IconButton(
             icon: Icon(Icons.person, size: screenWidth * 0.06),
-            onPressed: () => authController.logout(),
+            onPressed: () => context.push('/profile'),
           ),
         ],
       ),

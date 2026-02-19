@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import '../../features/auth/logic/auth_controller.dart';
 import '../../features/auth/presentation/login_page.dart';
 import '../../features/dashboard/presentation/dashboard.dart';
+import '../../features/profile/presentation/profile_page.dart';
 
 final routerProvider = Provider<GoRouter>((ref) {
   final authState = ref.watch(authControllerProvider);
@@ -33,6 +34,10 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/home',
         builder: (context, state) => const DashboardPage(),
+      ),
+      GoRoute(
+        path: '/profile',
+        builder: (context, state) => const ProfilePage(),
       ),
     ],
   );
