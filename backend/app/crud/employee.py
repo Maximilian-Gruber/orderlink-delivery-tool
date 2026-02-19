@@ -1,7 +1,7 @@
 from sqlalchemy.orm import Session
 from app.models.employee import Employees
 from app.schemas.employee import EmployeeOut
-from app.security import hash_password, verify_password
+from app.security import verify_password
 
 
 class EmployeeCRUD:

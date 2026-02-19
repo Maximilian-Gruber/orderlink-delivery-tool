@@ -2,10 +2,11 @@ from pydantic import BaseModel
 import uuid
 
 class EmployeeOut(BaseModel):
-    id: uuid.UUID
+    employeeId: uuid.UUID
     email: str
-    first_name: str
-    last_name: str
+    firstName: str
+    lastName: str
+    role: str
 
     class Config:
         from_attributes = True
