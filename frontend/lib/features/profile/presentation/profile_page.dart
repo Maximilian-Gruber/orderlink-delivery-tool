@@ -25,7 +25,7 @@ class ProfilePage extends ConsumerWidget {
         title: Text(loc.profile),
       ),
       body: profileAsync.when(
-        loading: () => const Center(child: CircularProgressIndicator()),
+        loading: () => _buildSkeletonList(contentPadding, screenWidth),
         error: (err, stack) => Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -117,6 +117,25 @@ class ProfilePage extends ConsumerWidget {
     );
   }
 
+  Widget _buildSkeletonList(double padding, double screenWidth) {
+    return SingleChildScrollView(
+      padding: EdgeInsets.symmetric(horizontal: padding, vertical: screenWidth * 0.05),
+      child: Column(
+        children: [
+          SizedBox(height: screenWidth * 0.05),
+          const _ProfileSkeleton(isAvatar: true),
+          SizedBox(height: screenWidth * 0.08),
+          const _ProfileSkeleton(),
+          const _ProfileSkeleton(),
+          const _ProfileSkeleton(),
+          const _ProfileSkeleton(),
+          SizedBox(height: screenWidth * 0.08),
+          const _ProfileSkeleton(isButton: true),
+        ],
+      ),
+    );
+  }
+
   Widget _buildInfoCard(BuildContext context, {
     required double screenWidth,
     required String title,
@@ -145,6 +164,74 @@ class ProfilePage extends ConsumerWidget {
             fontSize: screenWidth * 0.04,
             fontWeight: FontWeight.w600,
           ),
+        ),
+      ),
+    );
+  }
+}
+
+class _ProfileSkeleton extends StatelessWidget {
+  final bool isAvatar;
+  final bool isButton;
+
+  const _ProfileSkeleton({
+    this.isAvatar = false,
+    this.isButton = false,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+    final color = isDark ? Colors.white10 : Colors.black.withOpacity(0.05);
+    final screenWidth = MediaQuery.of(context).size.width;
+
+    if (isAvatar) {
+      return Container(
+        width: screenWidth * 0.24,
+        height: screenWidth * 0.24,
+        decoration: BoxDecoration(color: color, shape: BoxShape.circle),
+      );
+    }
+
+    if (isButton) {
+      return Container(
+        width: double.infinity,
+        height: screenWidth * 0.12,
+        decoration: BoxDecoration(
+          color: color,
+          borderRadius: BorderRadius.circular(8),
+        ),
+      );
+    }
+
+    return Container(
+      margin: EdgeInsets.only(bottom: screenWidth * 0.03),
+      height: screenWidth * 0.15,
+      decoration: BoxDecoration(
+        color: color,
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Padding(
+        padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.04),
+        child: Row(
+          children: [
+            Container(
+              width: screenWidth * 0.06,
+              height: screenWidth * 0.06,
+              decoration: BoxDecoration(color: color, shape: BoxShape.circle),
+            ),
+            SizedBox(width: screenWidth * 0.04),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Container(width: screenWidth * 0.15, height: 10, color: color),
+                const SizedBox(height: 8),
+                Container(width: screenWidth * 0.4, height: 12, color: color),
+              ],
+            )
+          ],
         ),
       ),
     );
