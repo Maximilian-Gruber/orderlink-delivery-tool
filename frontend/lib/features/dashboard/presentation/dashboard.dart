@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:frontend/features/auth/logic/auth_controller.dart';
 import 'package:frontend/features/dashboard/models/route_model.dart';
 import 'package:go_router/go_router.dart';
 import '../logic/dashboard_controller.dart';
@@ -17,7 +16,6 @@ class DashboardPage extends ConsumerWidget {
     final state = ref.watch(dashboardControllerProvider);
     final controller = ref.read(dashboardControllerProvider.notifier);
     final loc = AppLocalizations.of(context)!;
-    final authController = ref.read(authControllerProvider.notifier);
 
     final screenWidth = MediaQuery.of(context).size.width;
     final paddingStandard = screenWidth * 0.04;
