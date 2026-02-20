@@ -3,8 +3,10 @@ from .database import engine, Base
 from .routers import auth, site_config, route, employee
 import app.models
 from fastapi.middleware.cors import CORSMiddleware
+import os
 
-Base.metadata.create_all(bind=engine)
+if os.getenv("DB_INIT", "false").lower() == "true":
+    Base.metadata.create_all(bind=engine)
 
 app = FastAPI(title="FastAPI + Postgres (Docker Safe Setup)")
 
