@@ -1,11 +1,39 @@
-name: Build and Push API Docker Image
+name: Build, Test and Push API
 
 on:
   push:
     branches: [ "main" ]
 
 jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install dependencies
+        run: |
+          cd backend
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install pytest httpx  # httpx wird für den FastAPI TestClient benötigt
+
+      - name: Run Pytest
+        run: |
+          cd backend
+          # PYTHONPATH sorgt dafür, dass 'app' gefunden wird
+          export PYTHONPATH=$PYTHONPATH:.
+          # DB_INIT auf false, damit die App weiß, dass sie nicht initialisieren soll
+          export DB_INIT=false
+          python -m pytest app/tests/
+
   build-and-push:
+    needs: test
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code

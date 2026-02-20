@@ -1,7 +1,6 @@
 from fastapi import FastAPI
 from .database import engine, Base
 from .routers import auth, site_config, route, employee
-import app.models
 from fastapi.middleware.cors import CORSMiddleware
 import os
 
