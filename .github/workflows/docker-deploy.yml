@@ -1,4 +1,4 @@
-name: Build and Push Backend
+name: Build and Push API Docker Image
 
 on:
   push:
@@ -23,5 +23,5 @@ jobs:
           context: ./backend
           push: true
           tags: |
-            ${{ secrets.DOCKER_USERNAME }}/orderlink-api:latest
-            ${{ secrets.DOCKER_USERNAME }}/orderlink-api:${{ github.sha }}
+            ${{ secrets.DOCKER_USERNAME }}/orderlink-delivery-api:latest
+            ${{ secrets.DOCKER_USERNAME }}/orderlink-delivery-api:${{ github.sha }}
