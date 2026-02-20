@@ -6,7 +6,10 @@ from fastapi.middleware.cors import CORSMiddleware
 import os
 
 if os.getenv("DB_INIT", "false").lower() == "true":
+    print("DB_INIT is true: Creating tables...")
     Base.metadata.create_all(bind=engine)
+else:
+    print("DB_INIT is false: Skipping table creation.")
 
 app = FastAPI(title="FastAPI + Postgres (Docker Safe Setup)")
 

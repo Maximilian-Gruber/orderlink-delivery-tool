@@ -15,9 +15,6 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 COPY app ./app
 
-CMD uvicorn app.main:app \
-      --host 0.0.0.0 \
-      --port 8000 \
-      --reload \
-      --reload-dir /app \
-      --log-level debug
+ENV DB_INIT=false
+
+CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
