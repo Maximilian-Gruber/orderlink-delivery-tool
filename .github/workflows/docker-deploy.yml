@@ -21,14 +21,12 @@ jobs:
           cd backend
           python -m pip install --upgrade pip
           pip install -r requirements.txt
-          pip install pytest httpx  # httpx wird für den FastAPI TestClient benötigt
+          pip install pytest httpx
 
       - name: Run Pytest
         run: |
           cd backend
-          # PYTHONPATH sorgt dafür, dass 'app' gefunden wird
           export PYTHONPATH=$PYTHONPATH:.
-          # DB_INIT auf false, damit die App weiß, dass sie nicht initialisieren soll
           export DB_INIT=false
           python -m pytest app/tests/
 

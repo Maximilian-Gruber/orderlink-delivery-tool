@@ -33,8 +33,6 @@ services:
     restart: unless-stopped
     env_file:
       - .env
-    environment:
-      - DB_INIT=true
     volumes:
       - ./backend:/app
     depends_on:
