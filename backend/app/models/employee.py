@@ -5,7 +5,8 @@ from app.database import Base
 class Role(Base):
     __tablename__ = "roles"
 
-    name = Column(String, primary_key=True)
+    id = Column(String, primary_key=True)
+    name = Column(String, unique=True)
     description = Column(String, nullable=True)
     deleted = Column(Boolean, default=False)
 
@@ -24,6 +25,10 @@ class Employees(Base):
     deleted = Column(Boolean, default=False)
     superAdmin = Column(Boolean, default=False)
 
-    role = Column(String, ForeignKey("roles.name"))
+    roleId = Column("roleId", String, ForeignKey("roles.id"))
     role_rel = relationship("Role", back_populates="employees")
     otp = relationship("Otp", back_populates="employee", cascade="all, delete-orphan")
+
+    @property
+    def role(self):
+        return self.role_rel.name if self.role_rel else None
