@@ -12,7 +12,6 @@ class DashboardPage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
-    final brightness = theme.brightness;
     final state = ref.watch(dashboardControllerProvider);
     final controller = ref.read(dashboardControllerProvider.notifier);
     final loc = AppLocalizations.of(context)!;
@@ -52,16 +51,16 @@ class DashboardPage extends ConsumerWidget {
               ),
             ),
           ),
-
           Expanded(
-            child: _buildMainContent(state, controller, loc, theme, paddingStandard, brightness, screenWidth),
+            child: _buildMainContent(state, controller, loc, theme, paddingStandard, screenWidth),
           ),
         ],
       ),
     );
   }
 
-  Widget _buildMainContent(DashboardState state, DashboardController controller, AppLocalizations loc, ThemeData theme, double padding, Brightness brightness, double screenWidth) {
+  Widget _buildMainContent(DashboardState state, DashboardController controller, AppLocalizations loc, ThemeData theme, double padding, double screenWidth) {
+    final brightness = theme.brightness;
     if (state.loading && state.allRoutes.isEmpty) {
       return _buildSkeletonList(padding);
     }
@@ -355,12 +354,30 @@ class _OrderInfoTile extends StatelessWidget {
               borderRadius: BorderRadius.circular(8),
             ),
             child: Column(
-              children: order.products.map((p) => Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text("${p.amount}x ${p.productName}"),
-                  Text("${(p.price / 100).toStringAsFixed(2)}€"),
-                ],
+              children: order.products.map((p) => Padding(
+                padding: const EdgeInsets.symmetric(vertical: 2),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Expanded(
+                      child: Text(
+                        "${p.amount}x ${p.productName}",
+                        softWrap: true,
+                        style: TextStyle(fontSize: screenWidth * 0.032),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Text(
+                      "${(p.price / 100).toStringAsFixed(2)}€",
+                      style: TextStyle(
+                        fontSize: screenWidth * 0.032,
+                        fontWeight: FontWeight.w500,
+                        fontFeatures: const [FontFeature.tabularFigures()],
+                      ),
+                    ),
+                  ],
+                ),
               )).toList(),
             ),
           ),
