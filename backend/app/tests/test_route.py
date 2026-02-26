@@ -5,7 +5,7 @@ from unittest.mock import MagicMock, patch
 def test_get_logistics_overview_success(client):
     with patch("app.crud.route.RouteCRUD.get_active_routes_with_orders") as mocked_get:
         mock_route = MagicMock()
-        mock_route.routeId = "route-1"
+        mock_route.routeId = "60689a3b-1c54-40b8-91d6-e7a67f002adb"
         mock_route.name = "Nord-Tour"
         
         mock_order = MagicMock()
@@ -48,11 +48,11 @@ def test_get_logistics_overview_empty_filter(client):
 def test_get_orders_per_route_full_data(client):
     with patch("app.crud.route.RouteCRUD.get_orders_per_route") as mocked_get:
         mock_route = MagicMock()
-        mock_route.routeId = "route-99"
+        mock_route.routeId = "60689a3b-1c54-40b8-91d6-e7a67f002adb"
         mock_route.name = "Süd-Express"
         
         mock_order = MagicMock()
-        mock_order.orderId = "order-abc"
+        mock_order.orderId = "60689a3b-1c54-40b8-91d6-e7a67f002adb"
         mock_order.customer.firstName = "Susi"
         mock_order.customer.lastName = "Sorglos"
         mock_order.customer.address.city = "Graz"
@@ -79,11 +79,11 @@ def test_get_orders_per_route_full_data(client):
 def test_get_orders_per_route_no_address(client):
     with patch("app.crud.route.RouteCRUD.get_orders_per_route") as mocked_get:
         mock_route = MagicMock()
-        mock_route.routeId = "route-99"
+        mock_route.routeId = "60689a3b-1c54-40b8-91d6-e7a67f002adb"
         mock_route.name = "Express"
         
         mock_order = MagicMock()
-        mock_order.orderId = "order-123"
+        mock_order.orderId = "60689a3b-1c54-40b8-91d6-e7a67f002adb"
         mock_order.customer.firstName = "Keine"
         mock_order.customer.lastName = "Adresse"
         mock_order.customer.address = None 
