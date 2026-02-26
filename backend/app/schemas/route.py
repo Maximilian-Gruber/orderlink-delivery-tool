@@ -1,5 +1,6 @@
 from pydantic import BaseModel, ConfigDict
 from typing import List, Optional
+import uuid
 
 class BaseSchema(BaseModel):
     model_config = ConfigDict(from_attributes=True)
@@ -12,7 +13,7 @@ class CustomerAddress(BaseSchema):
     streetNumber: str
 
 class RouteSimple(BaseSchema):
-    routeId: str
+    routeId: uuid.UUID
     routeName: str
     customers: List[CustomerAddress]
 
@@ -22,7 +23,7 @@ class ProductSimple(BaseSchema):
     price: float
 
 class RouteOrder(BaseSchema):
-    orderId: str
+    orderId: uuid.UUID
     customerName: str
     city: str
     postCode: str
@@ -31,6 +32,6 @@ class RouteOrder(BaseSchema):
     products: List[ProductSimple]
 
 class RouteOrders(BaseSchema):
-    routeId: str
+    routeId: uuid.UUID
     routeName: str
     orders: List[RouteOrder]

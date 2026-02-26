@@ -4,7 +4,7 @@ from datetime import datetime
 from app.database import Base
 
 class SiteConfig(Base):
-    __tablename__ = "SiteConfig"
+    __tablename__ = "siteConfigs"
 
     siteConfigId = Column(String, primary_key=True)
     #tenantId = Column(String, ForeignKey("tenant_data.tenantId"), unique=True, nullable=True)

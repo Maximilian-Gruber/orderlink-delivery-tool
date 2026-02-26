@@ -10,7 +10,6 @@ class Category(Base):
     imagePath = Column(String, nullable=True)
     deleted = Column(Boolean, default=False)
 
-    products = relationship("Product", back_populates="category")
     history = relationship("ProductHistory", back_populates="category")
 
 
@@ -26,9 +25,7 @@ class Product(Base):
     createdAt = Column(DateTime, server_default=func.now())
     modifiedAt = Column(DateTime, onupdate=func.now())
     deleted = Column(Boolean, default=False)
-    categoryId = Column(String, ForeignKey("categories.categoryId"))
 
-    category = relationship("Category", back_populates="products")
     carts = relationship("CartOnProducts", back_populates="product")
     orders = relationship("OrderOnProducts", back_populates="product")
     history = relationship("ProductHistory", back_populates="product")
