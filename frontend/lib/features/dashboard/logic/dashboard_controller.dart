@@ -101,6 +101,6 @@ class DashboardController extends StateNotifier<DashboardState> {
 }
 
 final dashboardControllerProvider =
-    StateNotifierProvider<DashboardController, DashboardState>((ref) {
-  return DashboardController(ref);
+    StateNotifierProvider.autoDispose<DashboardController, DashboardState>((ref) {
+      return DashboardController(ref);
 });

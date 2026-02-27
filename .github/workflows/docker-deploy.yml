@@ -3,6 +3,8 @@ name: Build, Test and Push API
 on:
   push:
     branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
 
 jobs:
   test:
@@ -42,12 +44,15 @@ jobs:
         if: always()
         run: |
           cd backend
-          COVERAGE=$(grep -oP 'line-rate="\K[^"]+' coverage.xml | head -1)
-          PERCENT=$(echo "scale=0; $COVERAGE * 100 / 1" | bc -l)
-          echo "### Test Coverage: $PERCENT% :test_tube:" >> $GITHUB_STEP_SUMMARY
+          if [ -f coverage.xml ]; then
+            COVERAGE=$(grep -oP 'line-rate="\K[^"]+' coverage.xml | head -1)
+            PERCENT=$(echo "scale=0; $COVERAGE * 100 / 1" | bc -l)
+            echo "### Test Coverage: $PERCENT% :test_tube:" >> $GITHUB_STEP_SUMMARY
+          fi
 
   build-and-push:
     needs: test
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
