@@ -23,14 +23,28 @@ jobs:
           cd backend
           python -m pip install --upgrade pip
           pip install -r requirements.txt
-          pip install pytest httpx
 
-      - name: Run Pytest
+      - name: Run Pytest with Coverage
         run: |
           cd backend
           export PYTHONPATH=$PYTHONPATH:.
           export DB_INIT=false
-          python -m pytest app/tests/
+          python -m pytest --cov=app/routers --cov-report=xml --cov-report=term-missing app/tests/
+
+      - name: Upload Coverage Artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report
+          path: backend/coverage.xml
+
+      - name: Write Summary
+        if: always()
+        run: |
+          cd backend
+          COVERAGE=$(grep -oP 'line-rate="\K[^"]+' coverage.xml | head -1)
+          PERCENT=$(echo "scale=0; $COVERAGE * 100 / 1" | bc -l)
+          echo "### Test Coverage: $PERCENT% :test_tube:" >> $GITHUB_STEP_SUMMARY
 
   build-and-push:
     needs: test
