@@ -27,8 +27,8 @@ jobs:
         run: |
           sed -i 's|http://localhost:8000|https://orderlink-delivery-api-latest.onrender.com|g' frontend/lib/core/config.dart
           
-          echo "Config.dart angepasst:"
-          cat frontend/lib/core/config.dart
+          echo "Konfiguration auf Production umgestellt:"
+          grep "static const String baseUrl" frontend/lib/core/config.dart
 
       - name: Install Dependencies
         run: |
@@ -40,13 +40,19 @@ jobs:
           cd frontend
           flutter build apk --release --build-number=${{ github.run_number }}
 
-      - name: Send APK to Discord
+      - name: Upload APK and Notify Discord
         run: |
           APK_PATH=$(find frontend/build/app/outputs/flutter-apk/ -name "*release.apk" | head -n 1)
+          FILENAME=$(basename "$APK_PATH")
           
-          curl -H "Content-Type: multipart/form-data" \
-               -F "content=📱 **Neuer Android-Build verfügbar!** (Build #${{ github.run_number }}) @everyone" \
-               -F "file=@$APK_PATH" \
+          echo "Uploading $FILENAME to transfer.sh..."
+          DOWNLOAD_URL=$(curl --upload-file "$APK_PATH" "https://transfer.sh/$FILENAME")
+          
+          curl -H "Content-Type: application/json" \
+               -X POST \
+               -d "{
+                 \"content\": \"🚀 **Neuer Android-Build verfügbar!** (Build #${{ github.run_number }})\n\nLade sie hier direkt herunter:\n🔗 **$DOWNLOAD_URL**\n\n*(Link ist 14 Tage gültig)* @everyone\"
+               }" \
                ${{ secrets.DISCORD_WEBHOOK }}
 
       - name: Notify Failure
@@ -54,5 +60,5 @@ jobs:
         run: |
           curl -H "Content-Type: application/json" \
                -X POST \
-               -d '{"content": "❌ **Frontend Build fehlgeschlagen!** Überprüfe die GitHub Actions Logs."}' \
+               -d '{"content": "❌ **Frontend Build fehlgeschlagen!** Bitte check die GitHub Actions Logs."}' \
                ${{ secrets.DISCORD_WEBHOOK }}
