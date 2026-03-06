@@ -16,53 +16,55 @@ class DashboardPage extends ConsumerWidget {
     final controller = ref.read(dashboardControllerProvider.notifier);
     final loc = AppLocalizations.of(context)!;
 
-    final screenWidth = MediaQuery.of(context).size.width;
-    final paddingStandard = screenWidth * 0.04;
-
     return Scaffold(
       appBar: AppBar(
         title: Text(
           loc.openRoutes.toUpperCase(),
-          style: TextStyle(fontSize: screenWidth * 0.04, letterSpacing: 1.2),
+          style: const TextStyle(fontSize: 18, letterSpacing: 1.2),
         ),
         actions: [
           IconButton(
-            icon: Icon(Icons.person, size: screenWidth * 0.06),
+            icon: const Icon(Icons.person, size: 28),
             onPressed: () => context.push('/profile'),
           ),
         ],
       ),
-      body: Column(
-        children: [
-          Padding(
-            padding: EdgeInsets.all(paddingStandard),
-            child: TextField(
-              onChanged: (value) => controller.updateSearch(value),
-              decoration: InputDecoration(
-                hintText: "${loc.search}...",
-                prefixIcon: const Icon(Icons.search),
-                filled: true,
-                fillColor: theme.cardTheme.color,
-                contentPadding: const EdgeInsets.symmetric(vertical: 0),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide.none,
+      body: Center(
+        child: ConstrainedBox(
+          constraints: BoxConstraints(maxWidth: MediaQuery.of(context).size.width),
+          child: Column(
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: TextField(
+                  onChanged: (value) => controller.updateSearch(value),
+                  decoration: InputDecoration(
+                    hintText: "${loc.search}...",
+                    prefixIcon: const Icon(Icons.search),
+                    filled: true,
+                    fillColor: theme.cardTheme.color,
+                    contentPadding: const EdgeInsets.symmetric(vertical: 0),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: BorderSide.none,
+                    ),
+                  ),
                 ),
               ),
-            ),
+              Expanded(
+                child: _buildMainContent(state, controller, loc, theme),
+              ),
+            ],
           ),
-          Expanded(
-            child: _buildMainContent(state, controller, loc, theme, paddingStandard, screenWidth),
-          ),
-        ],
+        ),
       ),
     );
   }
 
-  Widget _buildMainContent(DashboardState state, DashboardController controller, AppLocalizations loc, ThemeData theme, double padding, double screenWidth) {
+  Widget _buildMainContent(DashboardState state, DashboardController controller, AppLocalizations loc, ThemeData theme) {
     final brightness = theme.brightness;
     if (state.loading && state.allRoutes.isEmpty) {
-      return _buildSkeletonList(padding);
+      return _buildSkeletonList();
     }
 
     if (state.error != null && state.allRoutes.isEmpty) {
@@ -79,7 +81,7 @@ class DashboardPage extends ConsumerWidget {
     return RefreshIndicator(
       onRefresh: () => controller.refresh(),
       child: ListView.builder(
-        padding: EdgeInsets.symmetric(horizontal: padding),
+        padding: const EdgeInsets.symmetric(horizontal: 16.0),
         itemCount: state.filteredRoutes.length,
         itemBuilder: (context, index) {
           final route = state.filteredRoutes[index];
@@ -89,16 +91,15 @@ class DashboardPage extends ConsumerWidget {
             controller: controller,
             loc: loc,
             theme: theme,
-            screenWidth: screenWidth,
           );
         },
       ),
     );
   }
 
-  Widget _buildSkeletonList(double padding) {
+  Widget _buildSkeletonList() {
     return ListView.builder(
-      padding: EdgeInsets.symmetric(horizontal: padding),
+      padding: const EdgeInsets.symmetric(horizontal: 16.0),
       itemCount: 5,
       itemBuilder: (context, index) => const _RouteSkeleton(),
     );
@@ -151,7 +152,6 @@ class _RouteCard extends StatelessWidget {
   final DashboardController controller;
   final AppLocalizations loc;
   final ThemeData theme;
-  final double screenWidth;
 
   const _RouteCard({
     super.key,
@@ -159,21 +159,19 @@ class _RouteCard extends StatelessWidget {
     required this.controller,
     required this.loc,
     required this.theme,
-    required this.screenWidth,
   });
 
   @override
   Widget build(BuildContext context) {
-    final padding = screenWidth * 0.04;
     return Card(
-      margin: EdgeInsets.only(bottom: padding),
+      margin: const EdgeInsets.only(bottom: 16.0),
       child: Theme(
         data: theme.copyWith(dividerColor: Colors.transparent),
         child: ExpansionTile(
-          leading: Icon(Icons.local_shipping, size: screenWidth * 0.06),
+          leading: const Icon(Icons.local_shipping, size: 28),
           title: Text(
             route.routeName,
-            style: TextStyle(fontWeight: FontWeight.bold, fontSize: screenWidth * 0.04),
+            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
           ),
           subtitle: Text("${route.customers.length} ${loc.stops}"),
           children: [
@@ -184,11 +182,11 @@ class _RouteCard extends StatelessWidget {
                       style: const TextStyle(fontWeight: FontWeight.bold)),
                   subtitle: Text(
                     "${customer.streetName} ${customer.streetNumber}, ${customer.postCode} ${customer.city}",
-                    style: TextStyle(fontSize: screenWidth * 0.03),
+                    style: const TextStyle(fontSize: 14),
                   ),
                 )),
             Padding(
-              padding: EdgeInsets.all(padding),
+              padding: const EdgeInsets.all(16.0),
               child: Row(
                 children: [
                   _ActionButton(
@@ -196,17 +194,13 @@ class _RouteCard extends StatelessWidget {
                     icon: Icons.info_outline,
                     color: theme.colorScheme.secondary,
                     onPressed: () => _showRouteInfoDialog(context, route.routeId, route.routeName, controller, loc),
-                    height: screenWidth * 0.12,
-                    fontSize: screenWidth * 0.025,
                   ),
-                  SizedBox(width: padding * 0.75),
+                  const SizedBox(width: 12),
                   _ActionButton(
                     label: loc.selectRoute.toUpperCase(),
                     icon: Icons.play_arrow,
                     color: theme.colorScheme.tertiary,
                     onPressed: () {HapticFeedback.lightImpact();},
-                    height: screenWidth * 0.12,
-                    fontSize: screenWidth * 0.025,
                   ),
                 ],
               ),
@@ -224,40 +218,45 @@ class _RouteCard extends StatelessWidget {
       context: context,
       builder: (context) => Dialog(
         key: ValueKey("dialog_$brightness"),
-        child: Container(
-          padding: EdgeInsets.all(screenWidth * 0.05),
-          constraints: BoxConstraints(maxHeight: MediaQuery.of(context).size.height * 0.8),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text("${loc.details} $routeName".toUpperCase(), style: const TextStyle(fontWeight: FontWeight.bold)),
-              const Divider(height: 24),
-              Flexible(
-                child: FutureBuilder<RouteOrders?>(
-                  future: controller.getRouteDetails(routeId),
-                  builder: (context, snapshot) {
-                    if (snapshot.connectionState == ConnectionState.waiting) return const Center(child: CircularProgressIndicator());
-                    if (snapshot.hasError || snapshot.data == null) return Center(child: Text(loc.errorWhileLoading));
-                    final data = snapshot.data!;
-                    return ListView.builder(
-                      shrinkWrap: true,
-                      itemCount: data.orders.length,
-                      itemBuilder: (context, index) => _OrderInfoTile(order: data.orders[index], screenWidth: screenWidth, theme: theme),
-                    );
-                  },
+        child: ConstrainedBox(
+          constraints: BoxConstraints(
+            maxWidth: 900,
+            maxHeight: MediaQuery.of(context).size.height * 0.8
+          ),
+          child: Padding(
+            padding: const EdgeInsets.all(20.0),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text("${loc.details} $routeName".toUpperCase(), style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
+                const Divider(height: 24),
+                Flexible(
+                  child: FutureBuilder<RouteOrders?>(
+                    future: controller.getRouteDetails(routeId),
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) return const Center(child: CircularProgressIndicator());
+                      if (snapshot.hasError || snapshot.data == null) return Center(child: Text(loc.errorWhileLoading));
+                      final data = snapshot.data!;
+                      return ListView.builder(
+                        shrinkWrap: true,
+                        itemCount: data.orders.length,
+                        itemBuilder: (context, index) => _OrderInfoTile(order: data.orders[index], theme: theme),
+                      );
+                    },
+                  ),
                 ),
-              ),
-              const Divider(height: 24),
-              SizedBox(
-                width: double.infinity,
-                height: 48,
-                child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(backgroundColor: theme.colorScheme.primary, foregroundColor: theme.colorScheme.onPrimary),
-                  onPressed: () => Navigator.pop(context),
-                  child: Text(loc.close.toUpperCase()),
+                const Divider(height: 24),
+                SizedBox(
+                  width: double.infinity,
+                  height: 48,
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(backgroundColor: theme.colorScheme.primary, foregroundColor: theme.colorScheme.onPrimary),
+                    onPressed: () => Navigator.pop(context),
+                    child: Text(loc.close.toUpperCase()),
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
@@ -270,25 +269,24 @@ class _ActionButton extends StatelessWidget {
   final IconData icon;
   final Color color;
   final VoidCallback onPressed;
-  final double height;
-  final double fontSize;
 
-  const _ActionButton({required this.label, required this.icon, required this.color, required this.onPressed, required this.height, required this.fontSize});
+  const _ActionButton({required this.label, required this.icon, required this.color, required this.onPressed});
 
   @override
   Widget build(BuildContext context) {
     return Expanded(
       child: SizedBox(
-        height: height,
+        height: 48,
         child: ElevatedButton.icon(
           onPressed: onPressed,
           style: ElevatedButton.styleFrom(
             backgroundColor: color,
             foregroundColor: Colors.white,
-            textStyle: TextStyle(fontSize: fontSize, fontWeight: FontWeight.bold, inherit: false),
+            padding: const EdgeInsets.symmetric(horizontal: 8),
+            textStyle: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold, inherit: false),
           ),
           icon: Icon(icon, size: 18),
-          label: Text(label),
+          label: Text(label, textAlign: TextAlign.center),
         ),
       ),
     );
@@ -331,10 +329,9 @@ class _RouteSkeleton extends StatelessWidget {
 
 class _OrderInfoTile extends StatelessWidget {
   final RouteOrder order;
-  final double screenWidth;
   final ThemeData theme;
 
-  const _OrderInfoTile({required this.order, required this.screenWidth, required this.theme});
+  const _OrderInfoTile({required this.order, required this.theme});
 
   @override
   Widget build(BuildContext context) {
@@ -345,7 +342,7 @@ class _OrderInfoTile extends StatelessWidget {
         children: [
           Text(order.customerName, style: const TextStyle(fontWeight: FontWeight.bold)),
           Text("${order.streetName} ${order.streetNumber}",
-              style: TextStyle(fontSize: screenWidth * 0.03, color: theme.disabledColor)),
+              style: TextStyle(fontSize: 14, color: theme.disabledColor)),
           const SizedBox(height: 8),
           Container(
             padding: const EdgeInsets.all(8),
@@ -364,16 +361,16 @@ class _OrderInfoTile extends StatelessWidget {
                       child: Text(
                         "${p.amount}x ${p.productName}",
                         softWrap: true,
-                        style: TextStyle(fontSize: screenWidth * 0.032),
+                        style: const TextStyle(fontSize: 14),
                       ),
                     ),
                     const SizedBox(width: 12),
                     Text(
                       "${(p.price / 100).toStringAsFixed(2)}€",
-                      style: TextStyle(
-                        fontSize: screenWidth * 0.032,
+                      style: const TextStyle(
+                        fontSize: 14,
                         fontWeight: FontWeight.w500,
-                        fontFeatures: const [FontFeature.tabularFigures()],
+                        fontFeatures: [FontFeature.tabularFigures()],
                       ),
                     ),
                   ],

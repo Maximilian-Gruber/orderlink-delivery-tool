@@ -15,28 +15,24 @@ class ProfilePage extends ConsumerWidget {
     
     final theme = Theme.of(context);
     final loc = AppLocalizations.of(context)!;
-    
-    final screenWidth = MediaQuery.of(context).size.width;
-    final contentPadding = screenWidth * 0.05;
-    final avatarRadius = screenWidth * 0.12;
-    final buttonHeight = screenWidth * 0.12;
 
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
         title: Text(loc.profile),
       ),
-      body: _buildContent(
-        context, 
-        state, 
-        controller, 
-        authController, 
-        screenWidth, 
-        contentPadding, 
-        avatarRadius, 
-        buttonHeight, 
-        theme, 
-        loc
+      body: Center(
+        child: ConstrainedBox(
+          constraints: BoxConstraints(maxWidth: MediaQuery.of(context).size.width),
+          child: _buildContent(
+            context, 
+            state, 
+            controller, 
+            authController, 
+            theme, 
+            loc
+          ),
+        ),
       ),
     );
   }
@@ -46,15 +42,11 @@ class ProfilePage extends ConsumerWidget {
     ProfileState state,
     ProfileController controller,
     AuthController authController,
-    double screenWidth,
-    double contentPadding,
-    double avatarRadius,
-    double buttonHeight,
     ThemeData theme,
     AppLocalizations loc,
   ) {
     if (state.loading && state.profile == null) {
-      return _buildSkeletonList(contentPadding, screenWidth);
+      return _buildSkeletonList();
     }
 
     if (state.error != null && state.profile == null) {
@@ -62,10 +54,10 @@ class ProfilePage extends ConsumerWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.error_outline, size: screenWidth * 0.12, color: Colors.red),
-            SizedBox(height: screenWidth * 0.04),
+            const Icon(Icons.error_outline, size: 48, color: Colors.red),
+            const SizedBox(height: 16),
             Text(loc.errorWhileLoading),
-            SizedBox(height: screenWidth * 0.04),
+            const SizedBox(height: 16),
             ElevatedButton(
               onPressed: () => controller.refresh(),
               child: Text(loc.retry),
@@ -79,68 +71,64 @@ class ProfilePage extends ConsumerWidget {
 
     final profile = state.profile!;
     return SingleChildScrollView(
-      padding: EdgeInsets.symmetric(horizontal: contentPadding, vertical: screenWidth * 0.05),
+      padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 24.0),
       child: Column(
         children: [
-          SizedBox(height: screenWidth * 0.05),
+          const SizedBox(height: 24),
           CircleAvatar(
-            radius: avatarRadius,
+            radius: 50,
             backgroundColor: theme.colorScheme.primary,
             child: Text(
               profile.firstName.isNotEmpty && profile.lastName.isNotEmpty
                   ? profile.firstName[0] + profile.lastName[0]
                   : "?",
               style: TextStyle(
-                fontSize: screenWidth * 0.08,
+                fontSize: 36,
                 color: theme.colorScheme.onPrimary,
                 fontWeight: FontWeight.bold,
               ),
             ),
           ),
-          SizedBox(height: screenWidth * 0.08),
+          const SizedBox(height: 32),
           
           _buildInfoCard(
             context,
-            screenWidth: screenWidth,
             title: loc.name,
             value: '${profile.firstName} ${profile.lastName}',
             icon: Icons.person_outline,
           ),
           _buildInfoCard(
             context,
-            screenWidth: screenWidth,
             title: loc.email,
             value: profile.email,
             icon: Icons.email_outlined,
           ),
           _buildInfoCard(
             context,
-            screenWidth: screenWidth,
             title: loc.role,
             value: profile.role,
             icon: Icons.badge_outlined,
           ),
           _buildInfoCard(
             context,
-            screenWidth: screenWidth,
             title: loc.id,
             value: profile.employeeId,
             icon: Icons.numbers,
           ),
           
-          SizedBox(height: screenWidth * 0.08),
+          const SizedBox(height: 32),
           
           // Logout Button
           SizedBox(
             width: double.infinity,
-            height: buttonHeight,
+            height: 52,
             child: ElevatedButton(
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.red.withOpacity(0.1),
                 foregroundColor: Colors.red,
                 side: const BorderSide(color: Colors.red),
-                textStyle: TextStyle(
-                  fontSize: screenWidth * 0.045,
+                textStyle: const TextStyle(
+                  fontSize: 16,
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -153,51 +141,50 @@ class ProfilePage extends ConsumerWidget {
     );
   }
 
-  Widget _buildSkeletonList(double padding, double screenWidth) {
-    return SingleChildScrollView(
-      padding: EdgeInsets.symmetric(horizontal: padding, vertical: screenWidth * 0.05),
+  Widget _buildSkeletonList() {
+    return const SingleChildScrollView(
+      padding: EdgeInsets.symmetric(horizontal: 24.0, vertical: 24.0),
       child: Column(
         children: [
-          SizedBox(height: screenWidth * 0.05),
-          const _ProfileSkeleton(isAvatar: true),
-          SizedBox(height: screenWidth * 0.08),
-          const _ProfileSkeleton(),
-          const _ProfileSkeleton(),
-          const _ProfileSkeleton(),
-          const _ProfileSkeleton(),
-          SizedBox(height: screenWidth * 0.08),
-          const _ProfileSkeleton(isButton: true),
+          SizedBox(height: 24),
+          _ProfileSkeleton(isAvatar: true),
+          SizedBox(height: 32),
+          _ProfileSkeleton(),
+          _ProfileSkeleton(),
+          _ProfileSkeleton(),
+          _ProfileSkeleton(),
+          SizedBox(height: 32),
+          _ProfileSkeleton(isButton: true),
         ],
       ),
     );
   }
 
   Widget _buildInfoCard(BuildContext context, {
-    required double screenWidth,
     required String title,
     required String value,
     required IconData icon,
   }) {
     final theme = Theme.of(context);
     return Card(
-      margin: EdgeInsets.only(bottom: screenWidth * 0.03),
+      margin: const EdgeInsets.only(bottom: 12.0),
       child: ListTile(
-        contentPadding: EdgeInsets.symmetric(
-          horizontal: screenWidth * 0.04, 
-          vertical: screenWidth * 0.01
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 16.0, 
+          vertical: 4.0
         ),
-        leading: Icon(icon, color: theme.colorScheme.primary, size: screenWidth * 0.06),
+        leading: Icon(icon, color: theme.colorScheme.primary, size: 28),
         title: Text(
           title,
           style: TextStyle(
-            fontSize: screenWidth * 0.03,
+            fontSize: 13,
             color: theme.textTheme.bodySmall?.color?.withOpacity(0.6),
           ),
         ),
         subtitle: Text(
           value,
-          style: TextStyle(
-            fontSize: screenWidth * 0.04,
+          style: const TextStyle(
+            fontSize: 16,
             fontWeight: FontWeight.w600,
           ),
         ),
@@ -220,12 +207,11 @@ class _ProfileSkeleton extends StatelessWidget {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
     final color = isDark ? Colors.white10 : Colors.black.withOpacity(0.05);
-    final screenWidth = MediaQuery.of(context).size.width;
 
     if (isAvatar) {
       return Container(
-        width: screenWidth * 0.24,
-        height: screenWidth * 0.24,
+        width: 100,
+        height: 100,
         decoration: BoxDecoration(color: color, shape: BoxShape.circle),
       );
     }
@@ -233,7 +219,7 @@ class _ProfileSkeleton extends StatelessWidget {
     if (isButton) {
       return Container(
         width: double.infinity,
-        height: screenWidth * 0.12,
+        height: 52,
         decoration: BoxDecoration(
           color: color,
           borderRadius: BorderRadius.circular(8),
@@ -242,29 +228,29 @@ class _ProfileSkeleton extends StatelessWidget {
     }
 
     return Container(
-      margin: EdgeInsets.only(bottom: screenWidth * 0.03),
-      height: screenWidth * 0.15,
+      margin: const EdgeInsets.only(bottom: 12.0),
+      height: 72,
       decoration: BoxDecoration(
         color: color,
         borderRadius: BorderRadius.circular(12),
       ),
       child: Padding(
-        padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.04),
+        padding: const EdgeInsets.symmetric(horizontal: 16.0),
         child: Row(
           children: [
             Container(
-              width: screenWidth * 0.06,
-              height: screenWidth * 0.06,
+              width: 28,
+              height: 28,
               decoration: BoxDecoration(color: color, shape: BoxShape.circle),
             ),
-            SizedBox(width: screenWidth * 0.04),
+            const SizedBox(width: 16),
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Container(width: screenWidth * 0.15, height: 10, color: color),
+                Container(width: 60, height: 10, color: color),
                 const SizedBox(height: 8),
-                Container(width: screenWidth * 0.4, height: 12, color: color),
+                Container(width: 150, height: 12, color: color),
               ],
             )
           ],
