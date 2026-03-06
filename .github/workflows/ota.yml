@@ -1,0 +1,72 @@
+name: Android OTA Deployment
+
+on:
+  push:
+    branches: [ "android-ota-deployment" ]
+
+jobs:
+  deploy-frontend:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+          cache: true
+
+      - name: Prepare Config for Production
+        run: |
+          # Pfad anpassen falls nötig!
+          sed -i 's|http://localhost:8000|https://orderlink-delivery-api-latest.onrender.com|g' frontend/lib/core/config.dart
+
+      - name: Install Dependencies
+        run: |
+          cd frontend
+          flutter pub get
+
+      - name: Build APK
+        run: |
+          cd frontend
+          flutter build apk --release --build-number=${{ github.run_number }}
+
+      - name: Create GitHub Release
+        id: create_release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: build-${{ github.run_number }}
+          name: Build #${{ github.run_number }}
+          draft: false
+          prerelease: false
+          files: frontend/build/app/outputs/flutter-apk/app-release.apk
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Notify Discord
+        run: |
+          RELEASE_URL="${{ github.server_url }}/${{ github.repository }}/releases/tag/build-${{ github.run_number }}"
+          
+          curl -H "Content-Type: application/json" \
+               -X POST \
+               -d "{
+                 \"content\": \"🚀 **Neuer Android-Build bereit!** (Build #${{ github.run_number }})\n\nLade die APK hier direkt herunter:\n🔗 **$RELEASE_URL**\n\n*(Einfach unter 'Assets' auf die .apk klicken)* @everyone\"
+               }" \
+               ${{ secrets.DISCORD_WEBHOOK }}
+
+      - name: Notify Failure
+        if: failure()
+        run: |
+          curl -H "Content-Type: application/json" \
+               -X POST \
+               -d '{"content": "❌ **Frontend Build fehlgeschlagen!**"}' \
+               ${{ secrets.DISCORD_WEBHOOK }}
