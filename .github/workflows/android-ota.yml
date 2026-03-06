@@ -25,10 +25,8 @@ jobs:
 
       - name: Prepare Config for Production
         run: |
-          sed -i 's|http://localhost:8000|https://orderlink-delivery-api-latest.onrender.com|g' frontend/lib/core/config.dart
-          
-          echo "Konfiguration auf Production umgestellt:"
-          grep "static const String baseUrl" frontend/lib/core/config.dart
+          sed -i 's|http://localhost:8000|https://orderlink-delivery-api-latest.onrender.com|g' frontend/lib/config.dart
+          echo "Konfiguration auf Production umgestellt."
 
       - name: Install Dependencies
         run: |
@@ -42,16 +40,19 @@ jobs:
 
       - name: Upload APK and Notify Discord
         run: |
+          # 1. Die APK Datei finden
           APK_PATH=$(find frontend/build/app/outputs/flutter-apk/ -name "*release.apk" | head -n 1)
-          FILENAME=$(basename "$APK_PATH")
           
-          echo "Uploading $FILENAME to transfer.sh..."
-          DOWNLOAD_URL=$(curl --upload-file "$APK_PATH" "https://transfer.sh/$FILENAME")
+          echo "Uploading to bashupload.com..."
+          RESPONSE=$(curl -L --upload-file "$APK_PATH" https://bashupload.com/)
+          DOWNLOAD_URL=$(echo "$RESPONSE" | grep -o 'https://bashupload.com/[^ ]*')
+          
+          echo "Download URL: $DOWNLOAD_URL"
           
           curl -H "Content-Type: application/json" \
                -X POST \
                -d "{
-                 \"content\": \"🚀 **Neuer Android-Build verfügbar!** (Build #${{ github.run_number }})\n\nLade sie hier direkt herunter:\n🔗 **$DOWNLOAD_URL**\n\n*(Link ist 14 Tage gültig)* @everyone\"
+                 \"content\": \"🚀 **Neuer Android-Build verfügbar!** (Build #${{ github.run_number }})\n\nLade die APK direkt herunter:\n🔗 **$DOWNLOAD_URL**\n\n*(Link ist ca. 7 Tage gültig)* @everyone\"
                }" \
                ${{ secrets.DISCORD_WEBHOOK }}
 
@@ -60,5 +61,5 @@ jobs:
         run: |
           curl -H "Content-Type: application/json" \
                -X POST \
-               -d '{"content": "❌ **Frontend Build fehlgeschlagen!** Bitte check die GitHub Actions Logs."}' \
+               -d '{"content": "❌ **Frontend Build fehlgeschlagen!** Check die GitHub Actions Logs."}' \
                ${{ secrets.DISCORD_WEBHOOK }}
