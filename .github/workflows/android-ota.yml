@@ -25,10 +25,10 @@ jobs:
 
       - name: Prepare Config for Production
         run: |
-          sed -i 's|http://localhost:8000|https://orderlink-delivery-api-latest.onrender.com|g' frontend/lib/config.dart
+          sed -i 's|http://localhost:8000|https://orderlink-delivery-api-latest.onrender.com|g' frontend/lib/core/config.dart
           
           echo "Config.dart angepasst:"
-          cat frontend/lib/config.dart
+          cat frontend/lib/core/config.dart
 
       - name: Install Dependencies
         run: |
