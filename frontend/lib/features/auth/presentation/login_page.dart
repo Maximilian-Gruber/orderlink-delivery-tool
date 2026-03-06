@@ -30,8 +30,6 @@ class _LoginPageState extends ConsumerState<LoginPage> {
     final theme = Theme.of(context);
     final primaryColor = theme.colorScheme.primary;
     final textColor = theme.textTheme.bodyMedium!.color;
-    final screenWidth = MediaQuery.of(context).size.width;
-    final fieldWidth = screenWidth * 0.9;
     final loc = AppLocalizations.of(context)!;
     
     ref.listen<AuthState>(authControllerProvider, (previous, next) {
@@ -49,58 +47,61 @@ class _LoginPageState extends ConsumerState<LoginPage> {
       backgroundColor: theme.scaffoldBackgroundColor,
       body: Center(
         child: SingleChildScrollView(
-          padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.05),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              // Company Name / Logo
-              siteConfigAsync.when(
-                loading: () => Padding(
-                  padding: EdgeInsets.only(bottom: screenWidth * 0.12),
-                  child: const CircularProgressIndicator(),
-                ),
-                error: (_, __) => Padding(
-                  padding: EdgeInsets.only(bottom: screenWidth * 0.12),
-                  child: Text(
-                    loc.appName,
-                    style: TextStyle(
-                      fontSize: screenWidth * 0.1,
-                      fontWeight: FontWeight.bold,
-                      color: textColor,
+          padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 48.0),
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 600),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                // Company Name / Logo
+                siteConfigAsync.when(
+                  loading: () => const Padding(
+                    padding: EdgeInsets.only(bottom: 48),
+                    child: Center(child: CircularProgressIndicator()),
+                  ),
+                  error: (_, __) => Padding(
+                    padding: const EdgeInsets.only(bottom: 48),
+                    child: Text(
+                      loc.appName,
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontSize: 32,
+                        fontWeight: FontWeight.bold,
+                        color: textColor,
+                      ),
                     ),
                   ),
-                ),
-                data: (config) {
-                  return Padding(
-                    padding: EdgeInsets.only(bottom: screenWidth * 0.12),
-                    child: Column(
-                      children: [
-                        if (config.logoPath.isNotEmpty)
-                          Padding(
-                            padding: const EdgeInsets.only(bottom: 20),
-                            child: Image.network(
-                              config.logoPath,
-                              height: screenWidth * 0.5,
+                  data: (config) {
+                    return Padding(
+                      padding: const EdgeInsets.only(bottom: 48),
+                      child: Column(
+                        children: [
+                          if (config.logoPath.isNotEmpty)
+                            Padding(
+                              padding: const EdgeInsets.only(bottom: 24),
+                              child: Image.network(
+                                config.logoPath,
+                                height: MediaQuery.of(context).size.height * 0.3,
+                              ),
+                            ),
+                          Text(
+                            config.companyName,
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              fontSize: 24,
+                              fontWeight: FontWeight.bold,
+                              color: textColor,
                             ),
                           ),
-                        Text(
-                          config.companyName,
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                            fontSize: screenWidth * 0.05,
-                            fontWeight: FontWeight.bold,
-                            color: textColor,
-                          ),
-                        ),
-                      ],
-                    ),
-                  );
-                },
-              ),
-              // Email Field
-              SizedBox(
-                width: fieldWidth,
-                child: TextField(
+                        ],
+                      ),
+                    );
+                  },
+                ),
+                
+                // Email Field
+                TextField(
                   controller: emailController,
                   keyboardType: TextInputType.emailAddress,
                   style: TextStyle(color: textColor),
@@ -109,13 +110,10 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                     labelStyle: TextStyle(color: textColor?.withOpacity(0.6)),
                   ),
                 ),
-              ),
-              SizedBox(height: screenWidth * 0.04),
+                const SizedBox(height: 16),
 
-              // Password Field
-              SizedBox(
-                width: fieldWidth,
-                child: TextField(
+                // Password Field
+                TextField(
                   controller: passwordController,
                   obscureText: true,
                   style: TextStyle(color: textColor),
@@ -124,47 +122,46 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                     labelStyle: TextStyle(color: textColor?.withOpacity(0.6)),
                   ),
                 ),
-              ),
-              SizedBox(height: screenWidth * 0.06),
+                const SizedBox(height: 32),
 
-              // Login Button
-              SizedBox(
-                width: fieldWidth,
-                height: screenWidth * 0.12,
-                child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: primaryColor,
-                    foregroundColor: theme.brightness == Brightness.dark
-                        ? Colors.black
-                        : Colors.white,
-                    textStyle: TextStyle(
-                      fontSize: screenWidth * 0.05,
-                      fontWeight: FontWeight.bold,
+                // Login Button
+                SizedBox(
+                  height: 48,
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: primaryColor,
+                      foregroundColor: theme.brightness == Brightness.dark
+                          ? Colors.black
+                          : Colors.white,
+                      textStyle: const TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
+                    onPressed: state.loading
+                        ? null
+                        : () {
+                            controller.login(
+                              emailController.text,
+                              passwordController.text,
+                            );
+                          },
+                    child: state.loading
+                        ? SizedBox(
+                            width: 24,
+                            height: 24,
+                            child: CircularProgressIndicator(
+                              color: theme.brightness == Brightness.dark
+                                  ? Colors.black
+                                  : Colors.white,
+                              strokeWidth: 3,
+                            ),
+                          )
+                        : Text(loc.login),
                   ),
-                  onPressed: state.loading
-                      ? null
-                      : () {
-                          controller.login(
-                            emailController.text,
-                            passwordController.text,
-                          );
-                        },
-                  child: state.loading
-                      ? SizedBox(
-                          width: screenWidth * 0.05,
-                          height: screenWidth * 0.05,
-                          child: CircularProgressIndicator(
-                            color: theme.brightness == Brightness.dark
-                                ? Colors.black
-                                : Colors.white,
-                            strokeWidth: screenWidth * 0.01,
-                          ),
-                        )
-                      : Text(loc.login),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
