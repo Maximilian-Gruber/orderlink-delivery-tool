@@ -1,102 +1,91 @@
 import pytest
+import uuid
 from unittest.mock import MagicMock, patch
 
 
 def test_get_logistics_overview_success(client):
     with patch("app.crud.route.RouteCRUD.get_active_routes_with_orders") as mocked_get:
+        mock_customer = MagicMock()
+        mock_customer.customerName = "Max Mustermann"
+        mock_customer.city = "Wien"
+        mock_customer.postCode = "1010"
+        mock_customer.streetName = "Stephansplatz"
+        mock_customer.streetNumber = "1"
+
         mock_route = MagicMock()
-        mock_route.routeId = "60689a3b-1c54-40b8-91d6-e7a67f002adb"
-        mock_route.name = "Nord-Tour"
-        
-        mock_order = MagicMock()
-        mock_order.deliveryDate = None
-        mock_order.customer.firstName = "Max"
-        mock_order.customer.lastName = "Mustermann"
-        mock_order.customer.address.city = "Wien"
-        mock_order.customer.address.postCode = "1010"
-        mock_order.customer.address.streetName = "Stephansplatz"
-        mock_order.customer.address.streetNumber = "1"
-        
-        mock_route_order = MagicMock()
-        mock_route_order.order = mock_order
-        mock_route.orders = [mock_route_order]
-        
+        mock_route.routeId = uuid.uuid4()
+        mock_route.routeName = "Nord-Tour"
+        mock_route.customers = [mock_customer]
+
         mocked_get.return_value = [mock_route]
 
         response = client.get("/routes/active-routes-with-orders-products")
+
         assert response.status_code == 200
         assert len(response.json()) == 1
+        assert response.json()[0]["routeName"] == "Nord-Tour"
+
 
 def test_get_logistics_overview_empty_filter(client):
     with patch("app.crud.route.RouteCRUD.get_active_routes_with_orders") as mocked_get:
-        mock_route = MagicMock()
-        mock_order = MagicMock()
-        mock_order.deliveryDate = "2024-05-20" 
-        
-        mock_route_order = MagicMock()
-        mock_route_order.order = mock_order
-        mock_route.orders = [mock_route_order]
-        
-        mocked_get.return_value = [mock_route]
+        mocked_get.return_value = []
 
         response = client.get("/routes/active-routes-with-orders-products")
-        
-        assert response.status_code == 200
-        assert response.json() == []
+
+        assert response.status_code == 404
 
 
 def test_get_orders_per_route_full_data(client):
     with patch("app.crud.route.RouteCRUD.get_orders_per_route") as mocked_get:
-        mock_route = MagicMock()
-        mock_route.routeId = "60689a3b-1c54-40b8-91d6-e7a67f002adb"
-        mock_route.name = "Süd-Express"
-        
+        mock_product = MagicMock()
+        mock_product.productName = "Bio-Apfel"
+        mock_product.amount = 5
+        mock_product.price = 2.50
+
         mock_order = MagicMock()
-        mock_order.orderId = "60689a3b-1c54-40b8-91d6-e7a67f002adb"
-        mock_order.customer.firstName = "Susi"
-        mock_order.customer.lastName = "Sorglos"
-        mock_order.customer.address.city = "Graz"
-        mock_order.customer.address.postCode = "8010"
-        mock_order.customer.address.streetName = "Herrengasse"
-        mock_order.customer.address.streetNumber = "1"
-        
-        mock_prod_link = MagicMock()
-        mock_prod_link.product.name = "Bio-Apfel"
-        mock_prod_link.product.price = 2.50
-        mock_prod_link.productAmount = 5
-        
-        mock_order.products = [mock_prod_link]
-        mock_route_order = MagicMock()
-        mock_route_order.order = mock_order
-        mock_route.orders = [mock_route_order]
-        
+        mock_order.orderId = uuid.uuid4()
+        mock_order.customerName = "Susi Sorglos"
+        mock_order.city = "Graz"
+        mock_order.postCode = "8010"
+        mock_order.streetName = "Herrengasse"
+        mock_order.streetNumber = "1"
+        mock_order.products = [mock_product]
+
+        mock_route = MagicMock()
+        mock_route.routeId = uuid.uuid4()
+        mock_route.routeName = "Süd-Express"
+        mock_route.orders = [mock_order]
+
         mocked_get.return_value = mock_route
 
         response = client.get("/routes/route-99/orders")
+
         assert response.status_code == 200
         assert response.json()["orders"][0]["products"][0]["productName"] == "Bio-Apfel"
 
+
 def test_get_orders_per_route_no_address(client):
     with patch("app.crud.route.RouteCRUD.get_orders_per_route") as mocked_get:
-        mock_route = MagicMock()
-        mock_route.routeId = "60689a3b-1c54-40b8-91d6-e7a67f002adb"
-        mock_route.name = "Express"
-        
         mock_order = MagicMock()
-        mock_order.orderId = "60689a3b-1c54-40b8-91d6-e7a67f002adb"
-        mock_order.customer.firstName = "Keine"
-        mock_order.customer.lastName = "Adresse"
-        mock_order.customer.address = None 
+        mock_order.orderId = uuid.uuid4()
+        mock_order.customerName = "Keine Adresse"
+        mock_order.city = "N/A"
+        mock_order.postCode = "N/A"
+        mock_order.streetName = "N/A"
+        mock_order.streetNumber = "N/A"
         mock_order.products = []
-        
-        mock_route_order = MagicMock()
-        mock_route_order.order = mock_order
-        mock_route.orders = [mock_route_order]
+
+        mock_route = MagicMock()
+        mock_route.routeId = uuid.uuid4()
+        mock_route.routeName = "Express"
+        mock_route.orders = [mock_order]
+
         mocked_get.return_value = mock_route
 
         response = client.get("/routes/route-99/orders")
-        
+
         assert response.status_code == 200
         data = response.json()
+
         assert data["orders"][0]["city"] == "N/A"
         assert data["orders"][0]["postCode"] == "N/A"
