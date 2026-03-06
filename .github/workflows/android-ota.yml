@@ -7,6 +7,8 @@ on:
 jobs:
   deploy-frontend:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
@@ -25,8 +27,8 @@ jobs:
 
       - name: Prepare Config for Production
         run: |
-          sed -i 's|http://localhost:8000|https://orderlink-delivery-api-latest.onrender.com|g' frontend/lib/core/config.dart
-          echo "Konfiguration auf Production umgestellt."
+          # Pfad anpassen falls nötig!
+          sed -i 's|http://localhost:8000|https://orderlink-delivery-api-latest.onrender.com|g' frontend/lib/config.dart
 
       - name: Install Dependencies
         run: |
@@ -38,21 +40,26 @@ jobs:
           cd frontend
           flutter build apk --release --build-number=${{ github.run_number }}
 
-      - name: Upload APK and Notify Discord
+      - name: Create GitHub Release
+        id: create_release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: build-${{ github.run_number }}
+          name: Build #${{ github.run_number }}
+          draft: false
+          prerelease: false
+          files: frontend/build/app/outputs/flutter-apk/app-release.apk
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Notify Discord
         run: |
-          # 1. Die APK Datei finden
-          APK_PATH=$(find frontend/build/app/outputs/flutter-apk/ -name "*release.apk" | head -n 1)
-          
-          echo "Uploading to bashupload.com..."
-          RESPONSE=$(curl -L --upload-file "$APK_PATH" https://bashupload.com/)
-          DOWNLOAD_URL=$(echo "$RESPONSE" | grep -o 'https://bashupload.com/[^ ]*')
-          
-          echo "Download URL: $DOWNLOAD_URL"
+          RELEASE_URL="${{ github.server_url }}/${{ github.repository }}/releases/tag/build-${{ github.run_number }}"
           
           curl -H "Content-Type: application/json" \
                -X POST \
                -d "{
-                 \"content\": \"🚀 **Neuer Android-Build verfügbar!** (Build #${{ github.run_number }})\n\nLade die APK direkt herunter:\n🔗 **$DOWNLOAD_URL**\n\n*(Link ist ca. 7 Tage gültig)* @everyone\"
+                 \"content\": \"🚀 **Neuer Android-Build bereit!** (Build #${{ github.run_number }})\n\nLade die APK hier direkt herunter:\n🔗 **$RELEASE_URL**\n\n*(Einfach unter 'Assets' auf die .apk klicken)* @everyone\"
                }" \
                ${{ secrets.DISCORD_WEBHOOK }}
 
@@ -61,5 +68,5 @@ jobs:
         run: |
           curl -H "Content-Type: application/json" \
                -X POST \
-               -d '{"content": "❌ **Frontend Build fehlgeschlagen!** Check die GitHub Actions Logs."}' \
+               -d '{"content": "❌ **Frontend Build fehlgeschlagen!**"}' \
                ${{ secrets.DISCORD_WEBHOOK }}
