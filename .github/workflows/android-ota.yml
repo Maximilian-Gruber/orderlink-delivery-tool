@@ -1,0 +1,58 @@
+name: Android OTA Deployment
+
+on:
+  push:
+    branches: [ "android-ota-deployment" ]
+
+jobs:
+  deploy-frontend:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+          cache: true
+
+      - name: Prepare Config for Production
+        run: |
+          sed -i 's|http://localhost:8000|https://orderlink-delivery-api-latest.onrender.com|g' frontend/lib/config.dart
+          
+          echo "Config.dart angepasst:"
+          cat frontend/lib/config.dart
+
+      - name: Install Dependencies
+        run: |
+          cd frontend
+          flutter pub get
+
+      - name: Build APK
+        run: |
+          cd frontend
+          flutter build apk --release --build-number=${{ github.run_number }}
+
+      - name: Send APK to Discord
+        run: |
+          APK_PATH=$(find frontend/build/app/outputs/flutter-apk/ -name "*release.apk" | head -n 1)
+          
+          curl -H "Content-Type: multipart/form-data" \
+               -F "content=📱 **Neuer Android-Build verfügbar!** (Build #${{ github.run_number }}) @everyone" \
+               -F "file=@$APK_PATH" \
+               ${{ secrets.DISCORD_WEBHOOK }}
+
+      - name: Notify Failure
+        if: failure()
+        run: |
+          curl -H "Content-Type: application/json" \
+               -X POST \
+               -d '{"content": "❌ **Frontend Build fehlgeschlagen!** Überprüfe die GitHub Actions Logs."}' \
+               ${{ secrets.DISCORD_WEBHOOK }}
