@@ -27,7 +27,6 @@ jobs:
 
       - name: Prepare Config for Production
         run: |
-          # Pfad anpassen falls nötig!
           sed -i 's|http://localhost:8000|https://orderlink-delivery-api-latest.onrender.com|g' frontend/lib/core/config.dart
 
       - name: Install Dependencies
@@ -40,6 +39,10 @@ jobs:
           cd frontend
           flutter build apk --release --build-number=${{ github.run_number }}
 
+      - name: Rename APK with Build Number
+        run: |
+          mv frontend/build/app/outputs/flutter-apk/app-release.apk frontend/build/app/outputs/flutter-apk/orderlink-build-${{ github.run_number }}.apk
+
       - name: Create GitHub Release
         id: create_release
         uses: softprops/action-gh-release@v2
@@ -48,7 +51,7 @@ jobs:
           name: Build #${{ github.run_number }}
           draft: false
           prerelease: false
-          files: frontend/build/app/outputs/flutter-apk/app-release.apk
+          files: frontend/build/app/outputs/flutter-apk/orderlink-build-${{ github.run_number }}.apk
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -59,14 +62,6 @@ jobs:
           curl -H "Content-Type: application/json" \
                -X POST \
                -d "{
-                 \"content\": \"🚀 **Neuer Android-Build bereit!** (Build #${{ github.run_number }})\n\nLade die APK hier direkt herunter:\n🔗 **$RELEASE_URL**\n\n*(Einfach unter 'Assets' auf die .apk klicken)* @everyone\"
+                 \"content\": \"🚀 **Neuer Orderlink-Delivery-Tool Build!** (Build #${{ github.run_number }})\n\nHier die APK herunterladen:\n🔗 **$RELEASE_URL**\n\n @everyone\"
                }" \
-               ${{ secrets.DISCORD_WEBHOOK }}
-
-      - name: Notify Failure
-        if: failure()
-        run: |
-          curl -H "Content-Type: application/json" \
-               -X POST \
-               -d '{"content": "❌ **Frontend Build fehlgeschlagen!**"}' \
                ${{ secrets.DISCORD_WEBHOOK }}
