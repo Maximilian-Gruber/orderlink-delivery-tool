@@ -7,6 +7,19 @@ on:
     branches: [ "main" ]
 
 jobs:
+  check-changes:
+    runs-on: ubuntu-latest
+    outputs:
+      frontend: ${{ steps.filter.outputs.frontend }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          filters: |
+            frontend:
+              - 'frontend/**'
+
   test:
     runs-on: ubuntu-latest
     steps:
@@ -73,8 +86,11 @@ jobs:
           cache-to: type=gha,mode=max
 
   deploy-frontend:
-    needs: test
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    needs: [test, check-changes]
+    if: |
+      github.event_name == 'push' && 
+      github.ref == 'refs/heads/main' && 
+      needs.check-changes.outputs.frontend == 'true'
     runs-on: ubuntu-latest
     permissions:
       contents: write
