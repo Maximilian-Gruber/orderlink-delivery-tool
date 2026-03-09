@@ -21,6 +21,24 @@ class _LoginPageState extends ConsumerState<LoginPage> {
     super.dispose();
   }
 
+  void _attemptLogin(BuildContext context, AuthController controller, AppLocalizations loc) {
+    final email = emailController.text.trim();
+    final password = passwordController.text;
+
+    if (email.isEmpty || password.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(loc.loginError, textAlign: TextAlign.center),
+        backgroundColor: Colors.red,
+        duration: const Duration(milliseconds: 1500),
+      ),
+      );
+      return;
+    }
+
+    controller.login(email, password);
+  }
+
   @override
   Widget build(BuildContext context) {
     final state = ref.watch(authControllerProvider);
@@ -33,11 +51,12 @@ class _LoginPageState extends ConsumerState<LoginPage> {
     final loc = AppLocalizations.of(context)!;
     
     ref.listen<AuthState>(authControllerProvider, (previous, next) {
-      if (next.error != null && next.error!.isNotEmpty) {
+      if (next.error != null && next.error!.isNotEmpty && next.error != previous?.error) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(loc.loginError, textAlign: TextAlign.center),
             backgroundColor: Colors.red,
+            duration: const Duration(milliseconds: 1500),
           ),
         );
       }
@@ -140,12 +159,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                     ),
                     onPressed: state.loading
                         ? null
-                        : () {
-                            controller.login(
-                              emailController.text,
-                              passwordController.text,
-                            );
-                          },
+                        : () => _attemptLogin(context, controller, loc),
                     child: state.loading
                         ? SizedBox(
                             width: 24,
