@@ -369,7 +369,7 @@ class _OrderInfoTile extends StatelessWidget {
                     ),
                     const SizedBox(width: 12),
                     Text(
-                      "${(p.price / 100).toStringAsFixed(2)}€",
+                      "${(p.price * p.amount / 100).toStringAsFixed(2)}€",
                       style: const TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.w500,
