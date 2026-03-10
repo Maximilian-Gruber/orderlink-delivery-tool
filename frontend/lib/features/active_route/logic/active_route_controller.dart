@@ -1,7 +1,8 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:frontend/core/api/api_client.dart';
-import 'package:frontend/features/dashboard/data/route_api.dart';
+import 'package:frontend/features/active_route/data/active_route_api.dart';
 import 'package:frontend/features/dashboard/models/route_model.dart';
+import 'package:geolocator/geolocator.dart';
 
 class ActiveRouteState {
   final bool loading;
@@ -34,17 +35,40 @@ class ActiveRouteState {
 class ActiveRouteController extends StateNotifier<ActiveRouteState> {
   final Ref ref;
   final String routeId;
-  late final RouteApi _api;
+  late final ActiveRouteApi _api;
 
   ActiveRouteController(this.ref, this.routeId) : super(ActiveRouteState()) {
-    _api = RouteApi(ref.read(apiClientProvider));
+    _api = ActiveRouteApi(ref.read(apiClientProvider));
     loadRouteOrders();
   }
 
-  Future<void> loadRouteOrders() async {
-    state = state.copyWith(loading: true, error: null);
+Future<void> loadRouteOrders() async {
+  state = state.copyWith(loading: true, error: null);
+  try {
+    Position? position;
     try {
-      final routeDetails = await _api.fetchRouteOrders(routeId);
+      LocationPermission permission = await Geolocator.checkPermission();
+      
+      if (permission == LocationPermission.denied) {
+        permission = await Geolocator.requestPermission();
+      }
+
+      if (permission == LocationPermission.always || permission == LocationPermission.whileInUse) {
+        position = await Geolocator.getCurrentPosition(
+          desiredAccuracy: LocationAccuracy.high,
+          timeLimit: const Duration(seconds: 5),
+        );
+      }
+    } catch (e) {
+    }
+
+
+    final routeDetails = await _api.fetchRouteOrdersFastest(
+      routeId, 
+      lat: position?.latitude, 
+      lon: position?.longitude
+    );
+          
       state = state.copyWith(
         loading: false,
         routeName: routeDetails.routeName,
