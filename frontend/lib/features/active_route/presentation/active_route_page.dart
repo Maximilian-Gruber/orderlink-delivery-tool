@@ -34,7 +34,10 @@ class _ActiveRoutePageState extends ConsumerState<ActiveRoutePage> {
           onPressed: () => context.pop(),
         ),
       ),
-      body: tabs[_currentIndex],
+      body: IndexedStack(
+        index: _currentIndex,
+        children: tabs,
+      ),
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _currentIndex,
         onTap: (index) => setState(() => _currentIndex = index),

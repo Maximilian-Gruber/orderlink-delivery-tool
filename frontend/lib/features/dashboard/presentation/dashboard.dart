@@ -1,6 +1,8 @@
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:intl/intl.dart'; // Für Tausender-Trennzeichen
 import 'package:frontend/features/dashboard/models/route_model.dart';
 import 'package:go_router/go_router.dart';
 import 'package:frontend/features/dashboard/logic/dashboard_controller.dart';
@@ -338,6 +340,12 @@ class _OrderInfoTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final currencyFormatter = NumberFormat.currency(
+      locale: 'de_DE', 
+      symbol: '€', 
+      decimalDigits: 2
+    );
+
     return Padding(
       padding: const EdgeInsets.only(bottom: 16),
       child: Column(
@@ -354,31 +362,34 @@ class _OrderInfoTile extends StatelessWidget {
               borderRadius: BorderRadius.circular(8),
             ),
             child: Column(
-              children: order.products.map((p) => Padding(
-                padding: const EdgeInsets.symmetric(vertical: 2),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Expanded(
-                      child: Text(
-                        "${p.amount}x ${p.productName}",
-                        softWrap: true,
-                        style: const TextStyle(fontSize: 14),
+              children: order.products.map((p) {
+                double totalItemPrice = (p.price * p.amount) / 100;
+                return Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 2),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Expanded(
+                        child: Text(
+                          "${p.amount}x ${p.productName}",
+                          softWrap: true,
+                          style: const TextStyle(fontSize: 14),
+                        ),
                       ),
-                    ),
-                    const SizedBox(width: 12),
-                    Text(
-                      "${(p.price * p.amount / 100).toStringAsFixed(2)}€",
-                      style: const TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w500,
-                        fontFeatures: [FontFeature.tabularFigures()],
+                      const SizedBox(width: 12),
+                      Text(
+                        currencyFormatter.format(totalItemPrice),
+                        style: const TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w500,
+                          fontFeatures: [FontFeature.tabularFigures()],
+                        ),
                       ),
-                    ),
-                  ],
-                ),
-              )).toList(),
+                    ],
+                  ),
+                );
+              }).toList(),
             ),
           ),
         ],
