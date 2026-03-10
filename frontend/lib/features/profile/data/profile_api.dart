@@ -1,5 +1,5 @@
-import '../../../../core/api/api_client.dart';
-import '../models/profile_model.dart';
+import 'package:frontend/core/api/api_client.dart';
+import 'package:frontend/features/profile/models/profile_model.dart';
 
 class ProfileApi {
   final ApiClient client;

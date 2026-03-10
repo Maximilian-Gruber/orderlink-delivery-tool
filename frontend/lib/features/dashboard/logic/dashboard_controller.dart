@@ -2,8 +2,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:frontend/core/api/api_client.dart';
 import 'package:frontend/features/auth/logic/auth_controller.dart';
 import 'package:dio/dio.dart';
-import '../data/route_api.dart';
-import '../models/route_model.dart';
+import 'package:frontend/features/dashboard/data/route_api.dart';
+import 'package:frontend/features/dashboard/models/route_model.dart';
 
 class DashboardState {
   final bool loading;

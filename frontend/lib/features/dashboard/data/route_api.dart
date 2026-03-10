@@ -1,5 +1,5 @@
-import '../../../../core/api/api_client.dart';
-import '../models/route_model.dart';
+import 'package:frontend/core/api/api_client.dart';
+import 'package:frontend/features/dashboard/models/route_model.dart';
 
 class RouteApi {
   final ApiClient client;

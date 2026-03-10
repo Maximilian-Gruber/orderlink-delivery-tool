@@ -73,4 +73,19 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get logout => 'Abmelden';
+
+  @override
+  String get orders => 'Bestellungen';
+
+  @override
+  String get navigation => 'Navigation';
+
+  @override
+  String get customer => 'Kunde';
+
+  @override
+  String get payment => 'Bezahlung';
+
+  @override
+  String get activeRoute => 'Aktive Route';
 }

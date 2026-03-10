@@ -147,6 +147,6 @@ jobs:
           curl -H "Content-Type: application/json" \
                -X POST \
                -d "{
-                 \"content\": \"🚀 **Neuer Orderlink-Delivery-Tool Build!** (Build #${{ github.run_number }})\n\nHier die APK herunterladen:\n🔗 **$RELEASE_URL**\n\n @everyone\"
+                 \"content\": \"🚀 **Neuer Orderlink-Delivery-Tool Build!** (Build #${{ github.run_number }})\n\nHier die APK herunterladen:\n🔗 **$RELEASE_URL**\"
                }" \
                ${{ secrets.DISCORD_WEBHOOK }}

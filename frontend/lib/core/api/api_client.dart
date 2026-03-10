@@ -2,8 +2,8 @@ import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:frontend/core/config.dart';
-import '../storage/secure_storage.dart';
-import '../../features/auth/logic/auth_controller.dart'; 
+import 'package:frontend/core/storage/secure_storage.dart';
+import 'package:frontend/features/auth/logic/auth_controller.dart'; 
 
 class ApiClient {
   final Dio dio;

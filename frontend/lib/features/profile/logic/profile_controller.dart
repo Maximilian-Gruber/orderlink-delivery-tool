@@ -1,7 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:frontend/core/api/api_client.dart';
-import '../data/profile_api.dart';
-import '../models/profile_model.dart';
+import 'package:frontend/features/profile/data/profile_api.dart';
+import 'package:frontend/features/profile/models/profile_model.dart';
 
 class ProfileState {
   final bool loading;

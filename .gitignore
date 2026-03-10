@@ -162,3 +162,4 @@ cython_debug/
 test_dataset*.sql
 prod.env
 .DS_Store
+useful_scripts.md
