@@ -21,5 +21,10 @@
   "name": "Name",
   "role": "Role",
   "id": "ID",
-  "logout": "Logout"
+  "logout": "Logout",
+  "orders" :"Orders",
+  "navigation": "Navigation",
+  "customer": "Customer",
+  "payment": "Payment",
+  "activeRoute": "Active Route"
 }

@@ -21,5 +21,10 @@
   "name": "Name",
   "role": "Rolle",
   "id": "ID",
-  "logout": "Abmelden"
+  "logout": "Abmelden",
+  "orders" :"Bestellungen",
+  "navigation": "Navigation",
+  "customer": "Kunde",
+  "payment": "Bezahlung",
+  "activeRoute": "Aktive Route"
 }
