@@ -1,5 +1,5 @@
-import '../../../core/api/api_client.dart';
-import '../models/site_config_model.dart';
+import 'package:frontend/core/api/api_client.dart';
+import 'package:frontend/features/auth/models/site_config_model.dart';
 
 class SiteConfigApi {
   final ApiClient client;

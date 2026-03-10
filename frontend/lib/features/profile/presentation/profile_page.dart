@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../../l10n/app_localizations.dart';
-import '../../auth/logic/auth_controller.dart';
-import '../logic/profile_controller.dart';
+import 'package:frontend/l10n/app_localizations.dart';
+import 'package:frontend/features/auth/logic/auth_controller.dart';
+import 'package:frontend/features/profile/logic/profile_controller.dart';
 
 class ProfilePage extends ConsumerWidget {
   const ProfilePage({super.key});

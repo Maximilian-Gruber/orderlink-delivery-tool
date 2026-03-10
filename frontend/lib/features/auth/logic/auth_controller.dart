@@ -1,9 +1,9 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:frontend/core/api/api_client.dart';
 import 'package:frontend/core/storage/secure_storage.dart';
-import '../data/auth_api.dart';
-import '../data/site_config_api.dart';
-import '../models/site_config_model.dart';
+import 'package:frontend/features/auth/data/auth_api.dart';
+import 'package:frontend/features/auth/data/site_config_api.dart';
+import 'package:frontend/features/auth/models/site_config_model.dart';
 
 class AuthState {
   final bool loading;

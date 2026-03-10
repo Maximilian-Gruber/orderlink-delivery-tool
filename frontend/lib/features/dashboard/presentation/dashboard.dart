@@ -3,8 +3,8 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:frontend/features/dashboard/models/route_model.dart';
 import 'package:go_router/go_router.dart';
-import '../logic/dashboard_controller.dart';
-import '../../../l10n/app_localizations.dart';
+import 'package:frontend/features/dashboard/logic/dashboard_controller.dart';
+import 'package:frontend/l10n/app_localizations.dart';
 
 class DashboardPage extends ConsumerWidget {
   const DashboardPage({super.key});
@@ -200,7 +200,10 @@ class _RouteCard extends StatelessWidget {
                     label: loc.selectRoute.toUpperCase(),
                     icon: Icons.play_arrow,
                     color: theme.colorScheme.tertiary,
-                    onPressed: () {HapticFeedback.lightImpact();},
+                    onPressed: () {
+                      HapticFeedback.lightImpact();
+                      context.push('/route/${route.routeId}');
+                    },
                   ),
                 ],
               ),
