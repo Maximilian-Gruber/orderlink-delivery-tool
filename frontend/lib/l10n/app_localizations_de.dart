@@ -27,7 +27,7 @@ class AppLocalizationsDe extends AppLocalizations {
   String get openRoutes => 'Offene Routen';
 
   @override
-  String get stops => 'Stops';
+  String get stops => 'Stopps';
 
   @override
   String get selectRoute => 'Route auswählen';
