@@ -88,4 +88,10 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get activeRoute => 'Active Route';
+
+  @override
+  String get prio => 'Prio';
+
+  @override
+  String get current => 'Active';
 }

@@ -18,7 +18,7 @@ class OrderSelectionTab extends ConsumerWidget {
     final loc = AppLocalizations.of(context)!;
 
     if (state.loading && state.orders.isEmpty) {
-      return _buildSkeletonList();
+      return _buildSkeletonList(theme);
     }
 
     if (state.error != null && state.orders.isEmpty) {
@@ -26,7 +26,12 @@ class OrderSelectionTab extends ConsumerWidget {
     }
 
     if (state.orders.isEmpty) {
-      return Center(child: Text(loc.noRoutesFound));
+      return Center(
+        child: Text(
+          loc.noRoutesFound,
+          style: TextStyle(color: theme.colorScheme.onBackground.withOpacity(0.5)),
+        ),
+      );
     }
 
     return Column(
@@ -35,20 +40,31 @@ class OrderSelectionTab extends ConsumerWidget {
           padding: const EdgeInsets.all(16.0),
           child: Text(
             state.routeName ?? "",
-            style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            style: theme.textTheme.titleLarge?.copyWith(
+              fontWeight: FontWeight.bold,
+              color: theme.colorScheme.onBackground,
+            ),
           ),
         ),
         Expanded(
           child: ReorderableListView.builder(
+            buildDefaultDragHandles: false,
             padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
             itemCount: state.orders.length,
             onReorder: controller.reorderOrders,
-            footer: const SizedBox(height: 16),
             proxyDecorator: (Widget child, int index, Animation<double> animation) {
-              return Material(
-                elevation: 0,
-                color: Colors.transparent,
-                borderRadius: BorderRadius.circular(12),
+              return AnimatedBuilder(
+                animation: animation,
+                builder: (context, child) {
+                  final double animValue = Curves.easeInOut.transform(animation.value);
+                  final double elevation = lerpDouble(0, 12, animValue)!;
+                  return Material(
+                    elevation: elevation,
+                    color: Colors.transparent,
+                    shadowColor: theme.colorScheme.primary.withOpacity(0.2),
+                    child: child,
+                  );
+                },
                 child: child,
               );
             },
@@ -57,8 +73,13 @@ class OrderSelectionTab extends ConsumerWidget {
               return _DraggableOrderCard(
                 key: ValueKey(order.orderId),
                 order: order,
+                index: index,
                 isCurrentTarget: index == 0,
                 theme: theme,
+                loc: loc,
+                onMoveToTop: () {
+                  if (index > 0) controller.reorderOrders(index, 0);
+                },
               );
             },
           ),
@@ -67,11 +88,11 @@ class OrderSelectionTab extends ConsumerWidget {
     );
   }
 
-  Widget _buildSkeletonList() {
+  Widget _buildSkeletonList(ThemeData theme) {
     return ListView.builder(
       padding: const EdgeInsets.all(16.0),
       itemCount: 6,
-      itemBuilder: (context, index) => const _OrderSkeleton(),
+      itemBuilder: (context, index) => _OrderSkeleton(theme: theme),
     );
   }
 
@@ -84,7 +105,11 @@ class OrderSelectionTab extends ConsumerWidget {
           children: [
             Icon(Icons.error_outline, size: 64, color: theme.colorScheme.error),
             const SizedBox(height: 16),
-            Text(loc.errorWhileLoading, textAlign: TextAlign.center, style: const TextStyle(fontWeight: FontWeight.bold)),
+            Text(
+              loc.errorWhileLoading,
+              textAlign: TextAlign.center,
+              style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
+            ),
             const SizedBox(height: 24),
             ElevatedButton.icon(
               onPressed: () => controller.loadRouteOrders(),
@@ -100,14 +125,20 @@ class OrderSelectionTab extends ConsumerWidget {
 
 class _DraggableOrderCard extends StatelessWidget {
   final RouteOrder order;
+  final int index;
   final bool isCurrentTarget;
   final ThemeData theme;
+  final VoidCallback onMoveToTop;
+  final AppLocalizations loc;
 
   const _DraggableOrderCard({
     super.key,
     required this.order,
+    required this.index,
     required this.isCurrentTarget,
     required this.theme,
+    required this.onMoveToTop,
+    required this.loc,
   });
 
   @override
@@ -116,53 +147,160 @@ class _DraggableOrderCard extends StatelessWidget {
     double totalCents = order.products.fold(0, (sum, item) => sum + (item.amount * item.price));
     String formattedPrice = currencyFormatter.format(totalCents / 100);
 
-    return Card(
-      elevation: isCurrentTarget ? 4 : 1,
+    final Color solidActiveColor = Color.alphaBlend(
+      theme.colorScheme.primary.withOpacity(0.05),
+      theme.cardTheme.color ?? theme.scaffoldBackgroundColor,
+    );
+
+    return Container(
       margin: const EdgeInsets.only(bottom: 12.0),
-      shape: RoundedRectangleBorder(
+      decoration: BoxDecoration(
+        color: isCurrentTarget ? solidActiveColor : theme.cardTheme.color,
         borderRadius: BorderRadius.circular(12),
-        side: isCurrentTarget ? BorderSide(color: theme.colorScheme.primary, width: 2) : BorderSide.none,
-      ),
-      child: Container(
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(12),
-          color: isCurrentTarget ? theme.colorScheme.primary.withOpacity(0.08) : Colors.transparent,
+        border: Border.all(
+          color: isCurrentTarget 
+              ? theme.colorScheme.primary 
+              : theme.dividerTheme.color ?? Colors.transparent,
+          width: isCurrentTarget ? 2 : 1,
         ),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 8.0),
         child: ListTile(
-          contentPadding: const EdgeInsets.all(16.0),
-          leading: Icon(
-            isCurrentTarget ? Icons.location_on : Icons.location_on_outlined,
-            color: isCurrentTarget ? theme.colorScheme.primary : theme.disabledColor,
-            size: 32,
-          ),
+          isThreeLine: true, 
+          contentPadding: const EdgeInsets.fromLTRB(16, 0, 8, 0),
+          leading: _buildStepIndicator(),
           title: Text(
             order.customerName,
-            style: TextStyle(fontWeight: isCurrentTarget ? FontWeight.bold : FontWeight.normal, fontSize: 16),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: theme.textTheme.titleMedium?.copyWith(
+              fontWeight: isCurrentTarget ? FontWeight.bold : FontWeight.w600,
+              color: theme.colorScheme.onSurface,
+            ),
           ),
-          subtitle: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const SizedBox(height: 4),
-              Text("${order.streetName} ${order.streetNumber}"),
-              Text("${order.postCode} ${order.city}"),
-            ],
+          subtitle: Padding(
+            padding: const EdgeInsets.only(top: 4.0),
+            child: Text(
+              "${order.streetName} ${order.streetNumber}\n${order.postCode} ${order.city}",
+              maxLines: 2,
+              style: theme.textTheme.bodySmall?.copyWith(
+                color: theme.colorScheme.onSurface.withOpacity(0.6),
+                height: 1.2,
+              ),
+            ),
           ),
-          trailing: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.end,
+          trailing: SizedBox(
+            width: 110, 
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                Expanded(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: [
+                      Text(
+                        formattedPrice,
+                        maxLines: 1,
+                        style: theme.textTheme.bodyMedium?.copyWith(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 14,
+                          fontFeatures: const [FontFeature.tabularFigures()],
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      _buildActionBadge(),
+                    ],
+                  ),
+                ),
+                const SizedBox(width: 4),
+                _buildDragHandle(),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildStepIndicator() {
+    return Container(
+      width: 32,
+      height: 32,
+      margin: const EdgeInsets.only(top: 8),
+      decoration: BoxDecoration(
+        color: isCurrentTarget ? theme.colorScheme.primary : theme.colorScheme.onSurface.withOpacity(0.1),
+        shape: BoxShape.circle,
+      ),
+      child: Center(
+        child: Text(
+          "${index + 1}",
+          style: TextStyle(
+            fontSize: 13,
+            fontWeight: FontWeight.bold,
+            color: isCurrentTarget ? theme.colorScheme.onPrimary : theme.colorScheme.onSurface,
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildActionBadge() {
+    if (!isCurrentTarget) {
+      return GestureDetector(
+        onTap: onMoveToTop,
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+          decoration: BoxDecoration(
+            border: Border.all(color: theme.colorScheme.primary.withOpacity(0.5)),
+            borderRadius: BorderRadius.circular(20),
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
             children: [
+              Icon(Icons.keyboard_double_arrow_up_rounded, size: 12, color: theme.colorScheme.primary),
+              const SizedBox(width: 2),
               Text(
-                formattedPrice,
-                style: const TextStyle(
+                loc.prio.toUpperCase(),
+                style: TextStyle(
+                  fontSize: 9,
                   fontWeight: FontWeight.bold,
-                  fontSize: 16,
-                  fontFeatures: [FontFeature.tabularFigures()],
+                  color: theme.colorScheme.primary,
                 ),
               ),
-              const SizedBox(height: 8),
-              Icon(Icons.drag_handle, color: theme.disabledColor),
             ],
           ),
+        ),
+      );
+    } else {
+      return Container(
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+        decoration: BoxDecoration(
+          color: theme.colorScheme.tertiary,
+          borderRadius: BorderRadius.circular(20),
+        ),
+        child: Text(
+          loc.current.toUpperCase(),
+          style: TextStyle(
+            fontSize: 9,
+            color: theme.colorScheme.onTertiary,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+      );
+    }
+  }
+
+  Widget _buildDragHandle() {
+    return ReorderableDragStartListener(
+      index: index,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 8),
+        child: Icon(
+          Icons.drag_indicator_rounded,
+          color: theme.colorScheme.onSurface.withOpacity(0.2),
+          size: 20,
         ),
       ),
     );
@@ -170,22 +308,26 @@ class _DraggableOrderCard extends StatelessWidget {
 }
 
 class _OrderSkeleton extends StatelessWidget {
-  const _OrderSkeleton();
+  final ThemeData theme;
+  const _OrderSkeleton({required this.theme});
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    final color = isDark ? Colors.white10 : Colors.black.withOpacity(0.05);
+    final color = theme.colorScheme.onSurface.withOpacity(0.05);
 
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       height: 100,
-      decoration: BoxDecoration(color: color, borderRadius: BorderRadius.circular(12)),
+      decoration: BoxDecoration(
+        color: theme.cardTheme.color,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: theme.dividerTheme.color ?? Colors.transparent),
+      ),
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: Row(
           children: [
-            Container(width: 40, height: 40, decoration: BoxDecoration(color: color, shape: BoxShape.circle)),
+            Container(width: 32, height: 32, decoration: BoxDecoration(color: color, shape: BoxShape.circle)),
             const SizedBox(width: 16),
             Expanded(
               child: Column(

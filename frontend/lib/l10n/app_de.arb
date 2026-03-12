@@ -26,5 +26,7 @@
   "navigation": "Navigation",
   "customer": "Kunde",
   "payment": "Bezahlung",
-  "activeRoute": "Aktive Route"
+  "activeRoute": "Aktive Route",
+  "prio": "Prio",
+  "current": "Aktiv"
 }

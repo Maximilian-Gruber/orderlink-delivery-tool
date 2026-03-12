@@ -256,6 +256,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Active Route'**
   String get activeRoute;
+
+  /// No description provided for @prio.
+  ///
+  /// In en, this message translates to:
+  /// **'Prio'**
+  String get prio;
+
+  /// No description provided for @current.
+  ///
+  /// In en, this message translates to:
+  /// **'Active'**
+  String get current;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {
