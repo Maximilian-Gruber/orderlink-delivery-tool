@@ -27,7 +27,7 @@ class AppLocalizationsDe extends AppLocalizations {
   String get openRoutes => 'Offene Routen';
 
   @override
-  String get stops => 'Stops';
+  String get stops => 'Stopps';
 
   @override
   String get selectRoute => 'Route auswählen';
@@ -88,4 +88,10 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get activeRoute => 'Aktive Route';
+
+  @override
+  String get prio => 'Prio';
+
+  @override
+  String get current => 'Aktiv';
 }

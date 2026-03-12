@@ -6,7 +6,7 @@
   "loginError": "Anmeldung fehlgeschlagen. Bitte erneut versuchen!",
   "appName": "OrderLink",
   "openRoutes": "Offene Routen",
-  "stops": "Stops",
+  "stops": "Stopps",
   "selectRoute": "Route auswählen",
   "routeInfo": "Info",
   "close": "Schließen",
@@ -26,5 +26,7 @@
   "navigation": "Navigation",
   "customer": "Kunde",
   "payment": "Bezahlung",
-  "activeRoute": "Aktive Route"
+  "activeRoute": "Aktive Route",
+  "prio": "Prio",
+  "current": "Aktiv"
 }

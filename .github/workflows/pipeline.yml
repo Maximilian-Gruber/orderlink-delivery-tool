@@ -119,34 +119,41 @@ jobs:
           cd frontend
           flutter pub get
 
+      - name: Set Flutter version for this build
+        run: |
+          cd frontend
+          # Intern bleibt das +BuildNumber für Android/iOS
+          sed -i "s/^version:.*/version: 0.1.0+${{ github.run_number }}/" pubspec.yaml
+
       - name: Build APK
         run: |
           cd frontend
-          flutter build apk --release --build-number=${{ github.run_number }}
+          flutter build apk --release --build-number=${{ github.run_number }} --build-name=0.1.0.${{ github.run_number }}
 
       - name: Rename APK with Build Number
         run: |
-          mv frontend/build/app/outputs/flutter-apk/app-release.apk frontend/build/app/outputs/flutter-apk/orderlink-delivery-build-${{ github.run_number }}.apk
+          mv frontend/build/app/outputs/flutter-apk/app-release.apk \
+             frontend/build/app/outputs/flutter-apk/orderlink-delivery-0.1.0.${{ github.run_number }}.apk
 
       - name: Create GitHub Release
         id: create_release
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: build-${{ github.run_number }}
-          name: Build #${{ github.run_number }}
+          tag_name: dev-0.1.0.${{ github.run_number }}
+          name: Orderlink Delivery Dev Build 0.1.0.${{ github.run_number }}
           draft: false
-          prerelease: false
-          files: frontend/build/app/outputs/flutter-apk/orderlink-delivery-build-${{ github.run_number }}.apk
+          prerelease: true
+          files: frontend/build/app/outputs/flutter-apk/orderlink-delivery-0.1.0.${{ github.run_number }}.apk
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Notify Discord
         run: |
-          RELEASE_URL="${{ github.server_url }}/${{ github.repository }}/releases/tag/build-${{ github.run_number }}"
+          RELEASE_URL="${{ github.server_url }}/${{ github.repository }}/releases/tag/dev-0.1.0.${{ github.run_number }}"
           
           curl -H "Content-Type: application/json" \
                -X POST \
                -d "{
-                 \"content\": \"🚀 **Neuer Orderlink-Delivery-Tool Build!** (Build #${{ github.run_number }})\n\nHier die APK herunterladen:\n🔗 **$RELEASE_URL**\"
+                 \"content\": \"🚀 **Neuer Orderlink-Delivery Dev Build!** (0.1.0.${{ github.run_number }})\n\nHier die APK herunterladen:\n🔗 **$RELEASE_URL**\" 
                }" \
                ${{ secrets.DISCORD_WEBHOOK }}
