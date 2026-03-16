@@ -12,7 +12,6 @@ android {
 
     signingConfigs {
         create("release") {
-            // System.getenv zieht die Secrets aus der GitHub Action Umgebung
             val keystorePath = System.getenv("ANDROID_KEYSTORE_PATH") ?: "keystore.jks"
             val keystorePassword = System.getenv("ANDROID_KEYSTORE_PASSWORD")
             val keyAliasName = System.getenv("ANDROID_KEY_ALIAS")
@@ -45,10 +44,8 @@ android {
 
     buildTypes {
         release {
-            // Hier wird jetzt die oben definierte release-Konfiguration verwendet
             signingConfig = signingConfigs.getByName("release")
             
-            // In Kotlin (.kts) heißen die Properties etwas anders:
             isMinifyEnabled = false
             isShrinkResources = false
             
