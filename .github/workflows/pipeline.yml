@@ -113,7 +113,7 @@ jobs:
         run: echo "${{ secrets.ANDROID_KEYSTORE_BASE64 }}" | base64 --decode > frontend/android/app/keystore.jks
 
       - name: Prepare Config for Production
-        run: sed -i 's|http://localhost:8000|https://orderlink-delivery-api-latest.com|g' frontend/lib/core/config.dart
+        run: sed -i 's|http://localhost:8000|https://orderlink-delivery-api-latest.onrender.com|g' frontend/lib/core/config.dart
 
       - name: Install Dependencies
         run: |
@@ -162,7 +162,7 @@ jobs:
                  "avatar_url": "https://raw.githubusercontent.com/fortawesome/Font-Awesome/6.x/svgs/solid/rocket.svg",
                  "embeds": [{
                    "title": "🚀 Neuer Android Build verfügbar!",
-                   "description": "Ein neuer Dev-Build wurde erfolgreich erstellt und signiert.",
+                   "description": "Ein neuer Dev-Build wurde erfolgreich erstellt.",
                    "color": 5814783,
                    "fields": [
                      { "name": "Version", "value": "0.1.0.${{ github.run_number }}", "inline": true },
