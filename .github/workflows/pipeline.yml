@@ -87,16 +87,15 @@ jobs:
 
   deploy-frontend:
     needs: [test, check-changes]
-    if: |
-      github.event_name == 'push' && 
-      github.ref == 'refs/heads/main' && 
-      needs.check-changes.outputs.frontend == 'true'
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main' && needs.check-changes.outputs.frontend == 'true'
     runs-on: ubuntu-latest
     permissions:
       contents: write
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Set up Java
         uses: actions/setup-java@v4
@@ -110,50 +109,69 @@ jobs:
           channel: 'stable'
           cache: true
 
+      - name: Decode Keystore
+        run: echo "${{ secrets.ANDROID_KEYSTORE_BASE64 }}" | base64 --decode > frontend/android/app/keystore.jks
+
       - name: Prepare Config for Production
-        run: |
-          sed -i 's|http://localhost:8000|https://orderlink-delivery-api-latest.onrender.com|g' frontend/lib/core/config.dart
+        run: sed -i 's|http://localhost:8000|https://orderlink-delivery-api-latest.com|g' frontend/lib/core/config.dart
 
       - name: Install Dependencies
         run: |
           cd frontend
           flutter pub get
 
-      - name: Set Flutter version for this build
+      - name: Set Flutter version
         run: |
           cd frontend
-          # Intern bleibt das +BuildNumber für Android/iOS
           sed -i "s/^version:.*/version: 0.1.0+${{ github.run_number }}/" pubspec.yaml
 
       - name: Build APK
         run: |
           cd frontend
           flutter build apk --release --build-number=${{ github.run_number }} --build-name=0.1.0.${{ github.run_number }}
+        env:
+          ANDROID_KEYSTORE_PATH: keystore.jks
+          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
 
-      - name: Rename APK with Build Number
-        run: |
-          mv frontend/build/app/outputs/flutter-apk/app-release.apk \
-             frontend/build/app/outputs/flutter-apk/orderlink-delivery-0.1.0.${{ github.run_number }}.apk
+      - name: Rename APK
+        run: mv frontend/build/app/outputs/flutter-apk/app-release.apk frontend/build/app/outputs/flutter-apk/orderlink-delivery-0.1.0.${{ github.run_number }}.apk
 
       - name: Create GitHub Release
         id: create_release
         uses: softprops/action-gh-release@v2
         with:
           tag_name: dev-0.1.0.${{ github.run_number }}
-          name: Orderlink Delivery Dev Build 0.1.0.${{ github.run_number }}
-          draft: false
-          prerelease: true
           files: frontend/build/app/outputs/flutter-apk/orderlink-delivery-0.1.0.${{ github.run_number }}.apk
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Notify Discord
+        if: success()
         run: |
+          COMMIT_MSG=$(git log -1 --pretty=format:"%s")
+          COMMIT_AUTHOR=$(git log -1 --pretty=format:"%an")
           RELEASE_URL="${{ github.server_url }}/${{ github.repository }}/releases/tag/dev-0.1.0.${{ github.run_number }}"
+          AVATAR_URL="https://github.com/${{ github.actor }}.png"
           
           curl -H "Content-Type: application/json" \
                -X POST \
-               -d "{
-                 \"content\": \"🚀 **Neuer Orderlink-Delivery Dev Build!** (0.1.0.${{ github.run_number }})\n\nHier die APK herunterladen:\n🔗 **$RELEASE_URL**\" 
-               }" \
+               -d '{
+                 "username": "Orderlink Build Bot",
+                 "avatar_url": "https://raw.githubusercontent.com/fortawesome/Font-Awesome/6.x/svgs/solid/rocket.svg",
+                 "embeds": [{
+                   "title": "🚀 Neuer Android Build verfügbar!",
+                   "description": "Ein neuer Dev-Build wurde erfolgreich erstellt und signiert.",
+                   "color": 5814783,
+                   "fields": [
+                     { "name": "Version", "value": "0.1.0.${{ github.run_number }}", "inline": true },
+                     { "name": "Author", "value": "'"$COMMIT_AUTHOR"'", "inline": true },
+                     { "name": "Letzter Commit", "value": "```'"$COMMIT_MSG"'```" },
+                     { "name": "Download APK", "value": "🔗 [Hier herunterladen]('"$RELEASE_URL"')" }
+                   ],
+                   "footer": { "text": "Orderlink CI/CD Pipeline", "icon_url": "'"$AVATAR_URL"'" },
+                   "timestamp": "'$(date -u +%Y-%m-%dT%H:%M:%SZ)'"
+                 }]
+               }' \
                ${{ secrets.DISCORD_WEBHOOK }}
